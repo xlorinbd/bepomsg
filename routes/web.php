@@ -3,6 +3,7 @@
     use App\Http\Controllers\Customer\PusherController;
     use App\Http\Controllers\Debug\DebugController;
     use App\Http\Controllers\LanguageController;
+    use App\Http\Controllers\WebsiteController;
 
 
     /*
@@ -16,14 +17,8 @@
     |
     */
 
-    Route::get('/', function () {
-
-        if (config('app.stage') == 'new') {
-            return redirect('install');
-        }
-
-        return redirect('login');
-    });
+    Route::get('/', [WebsiteController::class, 'home'])->name('home');
+    Route::get('package', [WebsiteController::class, 'packages'])->name('website.packages');
 
 // locale Route
     Route::get('lang/{locale}', [LanguageController::class, 'swap']);
