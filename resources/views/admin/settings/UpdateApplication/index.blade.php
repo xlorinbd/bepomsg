@@ -28,7 +28,7 @@
                                 <h4 class="text-danger mb-2">Before update, please take a backup you're all files and
                                     database.</h4>
 
-                                <p> Your are currently running on Beposms <code
+                                <p> Your are currently running on BepoMSG <code
                                             class="fw-bold">{{ config('app.version') }}</code> To upgrade your
                                     application, please download the latest build from <a
                                             href="https://codecanyon.net/item/ultimate-sms-bulk-sms-application-for-marketing/20062631"
@@ -148,7 +148,7 @@
 
                             </form>
                             @else
-                                <h3> Your are currently running on Beposms <code
+                                <h3> Your are currently running on BepoMSG <code
                                             class="fw-bold">{{ config('app.version') }}</code></h3>
                                 <h4 class="mt-1"><span class="text-primary"> CONGRATULATION!!!</span> You are using
                                     latest version</h4>

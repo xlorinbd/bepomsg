@@ -513,7 +513,7 @@ class SendingServerController extends AdminBaseController
         }
 
         $sendCustomData[$validated['destination_param']] = $validated['test_destination'] ?? '8801000000000';
-        $sendCustomData[$validated['message_param']]     = $validated['test_message'] ?? 'Beposms SMS gateway connection test';
+        $sendCustomData[$validated['message_param']]     = $validated['test_message'] ?? 'BepoMSG SMS gateway connection test';
 
         if (($validated['unicode_status'] ?? '0') === '1' && ! empty($validated['unicode_param'])) {
             $sendCustomData[$validated['unicode_param']] = $validated['unicode_value'] ?? '';

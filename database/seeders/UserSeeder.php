@@ -89,7 +89,7 @@ class UserSeeder extends Seeder
             'uid' => Str::uuid(),
             'phone' => '1234567890',
             'address' => 'Customer Address',
-            'company' => 'Beposms SMS',
+            'company' => 'BepoMSG SMS',
             'website' => 'https://bepomsg.com',
         ]);
 

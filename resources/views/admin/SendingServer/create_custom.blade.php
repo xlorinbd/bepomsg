@@ -205,7 +205,7 @@
                                         <div class="col-12">
                                             <div class="mb-1">
                                                 <label for="test_message" class="form-label">Test Message</label>
-                                                <textarea id="test_message" class="form-control" rows="2" name="test_message">Beposms SMS gateway connection test</textarea>
+                                                <textarea id="test_message" class="form-control" rows="2" name="test_message">BepoMSG SMS gateway connection test</textarea>
                                             </div>
                                         </div>
 

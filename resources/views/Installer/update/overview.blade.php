@@ -1,6 +1,6 @@
 @extends('layouts/fullLayoutMaster')
 
-@section('title', 'Beposms Update')
+@section('title', 'BepoMSG Update')
 
 @section('content')
     <div class="auth-wrapper auth-cover">

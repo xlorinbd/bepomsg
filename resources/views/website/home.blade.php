@@ -1,6 +1,6 @@
 @extends('website.layout')
 
-@section('title', config('app.name', 'Beposms') . ' — Bulk SMS & WhatsApp Marketing Platform')
+@section('title', config('app.name', 'BepoMSG') . ' — Bulk SMS & WhatsApp Marketing Platform')
 @section('meta_description', 'Send bulk SMS and WhatsApp campaigns, manage contacts, and automate messaging — all from one powerful, reliable platform.')
 
 @section('content')
@@ -9,7 +9,7 @@
         <div class="w-container w-hero-inner">
             <span class="w-eyebrow"><span class="dot"></span> Trusted by growing businesses</span>
             <h1>Reach every customer with <span>bulk SMS &amp; WhatsApp</span> marketing that works</h1>
-            <p>{{ config('app.name', 'Beposms') }} helps you send campaigns, manage contacts, and automate messaging at scale — with reliable delivery and real-time reporting built in.</p>
+            <p>{{ config('app.name', 'BepoMSG') }} helps you send campaigns, manage contacts, and automate messaging at scale — with reliable delivery and real-time reporting built in.</p>
             <div class="w-hero-actions">
                 <a href="{{ route('register') }}" class="w-btn w-btn-light w-btn-lg">Get Started Free</a>
                 <a href="{{ route('website.packages') }}" class="w-btn w-btn-ghost w-btn-lg" style="border-color:rgba(255,255,255,0.25); color:#fff;">View Pricing</a>
@@ -29,7 +29,7 @@
             <div class="w-section-head">
                 <span class="w-kicker">Features</span>
                 <h2>Everything you need to run messaging campaigns</h2>
-                <p>From your first campaign to global scale, {{ config('app.name', 'Beposms') }} gives you the tools to reach customers reliably.</p>
+                <p>From your first campaign to global scale, {{ config('app.name', 'BepoMSG') }} gives you the tools to reach customers reliably.</p>
             </div>
 
             <div class="w-grid">
@@ -132,7 +132,7 @@
         <div class="w-container">
             <div class="w-cta">
                 <h2>Ready to start sending?</h2>
-                <p>Join businesses using {{ config('app.name', 'Beposms') }} to reach their customers reliably, every time.</p>
+                <p>Join businesses using {{ config('app.name', 'BepoMSG') }} to reach their customers reliably, every time.</p>
                 <a href="{{ route('register') }}" class="w-btn w-btn-light w-btn-lg">Create Your Free Account</a>
             </div>
         </div>

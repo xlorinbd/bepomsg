@@ -5,7 +5,7 @@
         <span class="float-md-left d-block d-md-inline-block mt-25"> {!! config('app.footer_text') !!}
             <a class="ms-25" href="{{ route('login') }}">{{ config('app.name') }},</a>
             <a class="ms-25 text-primary" target="_blank"
-               href="{{ config('app.editor_site_url', 'https://sakif.pro.bd') }}">{{ config('app.editor_name', 'Beposms') }}</a>
+               href="{{ config('app.editor_site_url', 'https://sakif.pro.bd') }}">{{ config('app.editor_name', 'BepoMSG') }}</a>
             <span class="d-none d-sm-inline-block">{{ __('locale.labels.all_rights_reserved') }}</span>
         </span>
 

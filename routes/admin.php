@@ -3,8 +3,8 @@
 /*
  * All routes for admin portal
  *
- * Item Name: Beposms - SMS Application
- * Author: Beposms
+ * Item Name: BepoMSG - SMS Application
+ * Author: BepoMSG
  * Author URL: https://sakif.pro.bd
  */
 

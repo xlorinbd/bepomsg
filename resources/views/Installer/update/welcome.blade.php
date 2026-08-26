@@ -1,6 +1,6 @@
 @extends('layouts/fullLayoutMaster')
 
-@section('title', 'Beposms Auto Installer')
+@section('title', 'BepoMSG Auto Installer')
 
 
 @section('vendor-style')

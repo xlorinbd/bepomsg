@@ -48,15 +48,15 @@ class AppConfig extends Model
         return [
             [
                 'setting' => 'app_name',
-                'value' => 'Beposms',
+                'value' => 'BepoMSG',
             ],
             [
                 'setting' => 'app_title',
-                'value' => 'Beposms SMS Platform',
+                'value' => 'BepoMSG SMS Platform',
             ],
             [
                 'setting' => 'app_keyword',
-                'value' => 'beposms, bulk sms, sms marketing, messaging platform, laravel',
+                'value' => 'bepomsg, bulk sms, sms marketing, messaging platform, laravel',
             ],
             [
                 'setting' => 'license',
@@ -76,7 +76,7 @@ class AppConfig extends Model
             ],
             [
                 'setting' => 'from_name',
-                'value' => 'Beposms',
+                'value' => 'BepoMSG',
             ],
             [
                 'setting' => 'company_address',
@@ -88,7 +88,7 @@ class AppConfig extends Model
             ],
             [
                 'setting' => 'footer_text',
-                'value' => 'Copyright &copy; Beposms - 2026',
+                'value' => 'Copyright &copy; BepoMSG - 2026',
             ],
             [
                 'setting' => 'app_logo',

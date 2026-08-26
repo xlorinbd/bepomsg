@@ -1,6 +1,6 @@
-# Beposms - Bulk SMS Marketing Platform
+# BepoMSG - Bulk SMS Marketing Platform
 
-Beposms is a powerful, flexible, and user-friendly Bulk SMS Marketing Platform built with Laravel. It supports multiple payment gateways, SMS credit management, campaigns, and more.
+BepoMSG is a powerful, flexible, and user-friendly Bulk SMS Marketing Platform built with Laravel. It supports multiple payment gateways, SMS credit management, campaigns, and more.
 
 ## Prerequisites
 
@@ -89,7 +89,7 @@ To keep your live server updated with the latest code from GitHub:
 3. Initialize and connect the project:
    ```bash
    git init
-   git remote add origin git@github.com:xlorinbd/beposms.git
+   git remote add origin git@github.com:xlorinbd/bepomsg.git
    git pull origin main
    ```
 

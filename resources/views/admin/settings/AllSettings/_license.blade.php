@@ -2,13 +2,13 @@
     <div class="divider divider-primary">
         <div class="divider-text"><h4 class="text-primary">Your current license</h4></div>
     </div>
-    <p>Thank you for using Beposms! Below is your license key, also known as Purchase Code. Your license type is <strong class="text-primary"> {{\App\Helpers\Helper::app_config('license_type')}}</strong></p>
+    <p>Thank you for using BepoMSG! Below is your license key, also known as Purchase Code. Your license type is <strong class="text-primary"> {{\App\Helpers\Helper::app_config('license_type')}}</strong></p>
     <h4>{{\App\Helpers\Helper::app_config('license')}}</h4>
 
     <div class="divider divider-primary mt-3">
         <div class="divider-text"><h4 class="text-primary">License types</h4></div>
     </div>
-    <p>When you purchase Beposms from Envato website, you are actually purchasing a license to use the product.
+    <p>When you purchase BepoMSG from Envato website, you are actually purchasing a license to use the product.
         There are 2 types of license that are issued</p>
 
     <h4>Regular License</h4>

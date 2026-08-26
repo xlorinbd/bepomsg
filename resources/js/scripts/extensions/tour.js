@@ -2,8 +2,8 @@
 	File Name: tour.js
 	Description: tour
 	----------------------------------------------------------------------------------------
-	Item Name: Beposms - SMS Platform
-	Author: Beposms
+	Item Name: BepoMSG - SMS Platform
+	Author: BepoMSG
 	Author URL: https://sakif.pro.bd
 ==========================================================================================*/
 
@@ -17,8 +17,8 @@ $(document).ready(function () {
 
     // tour steps
     tour.addStep('step-1', {
-        text: 'Thank you for choosing Beposms!<br><br>' +
-            'This small tour will guide you through some of the Beposms features and will help you get started using the application.<br><br>' +
+        text: 'Thank you for choosing BepoMSG!<br><br>' +
+            'This small tour will guide you through some of the BepoMSG features and will help you get started using the application.<br><br>' +
             'If you ever need support, please visit <code>https://sakif.pro.bd</code><br><br>' +
             'Let\'s get started!',
         buttons: [
@@ -35,11 +35,11 @@ $(document).ready(function () {
     });
 
     tour.addStep('step-2', {
-        text: 'In order to make things easier to manage, Beposms is divided into several small sub-apps, like the <code>backend, customer, api</code><br><br>' +
+        text: 'In order to make things easier to manage, BepoMSG is divided into several small sub-apps, like the <code>backend, customer, api</code><br><br>' +
             'The <code>backend</code> app is used for administrative tasks and here only the system users have access. You can create plan, customers, subscriptions, etc<br><br>' +
             'The <code>customer</code> app is used to create manage phone lists, subscribers, campaigns , and many more.<br><br>' +
             'The <code>api</code> app is used to allow custom integrations from various other apps with your own app, like customers sending sms from external systems to their lists. You can disable it any any time!<br><br>' +
-            'To run Beposms, first, you need to create a <code>Sending Server</code>, then a <code>Plan</code>, after that, assign your created sending server on the plan. Finally, create a <code>customer</code> and assign the created plan.<br><br>' +
+            'To run BepoMSG, first, you need to create a <code>Sending Server</code>, then a <code>Plan</code>, after that, assign your created sending server on the plan. Finally, create a <code>customer</code> and assign the created plan.<br><br>' +
             'Click on next then you will find all details',
         buttons: [
 
@@ -146,7 +146,7 @@ $(document).ready(function () {
     });
 
     tour.addStep('step-7', {
-        text: 'Beposms is flexible and modern. Please check all features perfectly then you will find all details about Beposms.',
+        text: 'BepoMSG is flexible and modern. Please check all features perfectly then you will find all details about BepoMSG.',
         buttons: [
             {
                 text: "previous",

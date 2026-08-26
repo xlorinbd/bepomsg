@@ -1,7 +1,7 @@
 @extends('website.layout')
 
-@section('title', 'Packages & Pricing — ' . config('app.name', 'Beposms'))
-@section('meta_description', 'Compare Beposms SMS and WhatsApp marketing plans and find the right package for your business.')
+@section('title', 'Packages & Pricing — ' . config('app.name', 'BepoMSG'))
+@section('meta_description', 'Compare BepoMSG SMS and WhatsApp marketing plans and find the right package for your business.')
 
 @section('content')
 

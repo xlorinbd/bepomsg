@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', config('app.title', config('app.name')))</title>
-    <meta name="description" content="@yield('meta_description', 'Beposms is a powerful bulk SMS and WhatsApp marketing platform for businesses of every size.')">
+    <meta name="description" content="@yield('meta_description', 'BepoMSG is a powerful bulk SMS and WhatsApp marketing platform for businesses of every size.')">
     <link rel="icon" href="{{ asset('favicon.ico') }}">
     <style>
         :root {
@@ -442,7 +442,7 @@
     <div class="w-container w-header-inner">
         <a href="{{ route('home') }}" class="w-logo">
             <span class="w-logo-mark">B</span>
-            {{ config('app.name', 'Beposms') }}
+            {{ config('app.name', 'BepoMSG') }}
         </a>
         <nav class="w-nav">
             <div class="w-nav-links">
@@ -466,7 +466,7 @@
             <div class="w-footer-brand">
                 <a href="{{ route('home') }}" class="w-logo" style="color:#fff;">
                     <span class="w-logo-mark">B</span>
-                    {{ config('app.name', 'Beposms') }}
+                    {{ config('app.name', 'BepoMSG') }}
                 </a>
                 <p>{{ config('app.title', 'Bulk SMS & WhatsApp marketing platform') }} — reach your customers instantly, at scale.</p>
             </div>
@@ -485,7 +485,7 @@
         </div>
         <div class="w-footer-bottom">
             <span>{!! config('app.footer_text', 'Copyright &copy; ' . config('app.name') . ' - ' . date('Y')) !!}</span>
-            <span>Powered by {{ config('app.name', 'Beposms') }}</span>
+            <span>Powered by {{ config('app.name', 'BepoMSG') }}</span>
         </div>
     </div>
 </footer>

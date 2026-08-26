@@ -15,7 +15,7 @@ return [
     |
     */
 
-    'name' => env('APP_NAME', 'Beposms'),
+    'name' => env('APP_NAME', 'BepoMSG'),
 
 
     /*
@@ -29,7 +29,7 @@ return [
     |
     */
 
-    'title' => env('APP_TITLE', 'Beposms SMS Platform'),
+    'title' => env('APP_TITLE', 'BepoMSG SMS Platform'),
 
 
     /*
@@ -41,7 +41,7 @@ return [
     |
     */
 
-    'keyword' => env('APP_KEYWORD', 'beposms, bulk sms, sms marketing, messaging platform, laravel'),
+    'keyword' => env('APP_KEYWORD', 'bepomsg, bulk sms, sms marketing, messaging platform, laravel'),
 
 
     /*
@@ -74,7 +74,7 @@ return [
     | This is the footer text of your application.
     |
     */
-    'footer_text' => env('APP_FOOTER_TEXT', 'Copyright &copy; Beposms - 2026'),
+    'footer_text' => env('APP_FOOTER_TEXT', 'Copyright &copy; BepoMSG - 2026'),
 
 
     /*
