@@ -7,6 +7,8 @@
 
 @section('page-style')
   <link rel="stylesheet" href="{{ asset(mix('css/base/pages/authentication.css')) }}">
+
+  @include('auth._brand-style')
 @endsection
 
 @section('content')
@@ -19,13 +21,11 @@
       <!-- /Brand logo-->
 
       <!-- Left Text-->
-      <div class="d-none d-lg-flex col-lg-8 align-items-center p-5">
-        <div class="w-100 d-lg-flex align-items-center justify-content-center px-5">
-          @if($configData['theme'] === 'dark')
-            <img class="img-fluid" src="{{asset('images/pages/two-steps-verification-illustration-dark.svg')}}" alt="two steps verification" />
-          @else
-            <img class="img-fluid" src="{{asset('images/pages/two-steps-verification-illustration.svg')}}" alt="two steps verification" />
-          @endif
+      <div class="d-none d-lg-flex col-lg-8 align-items-center p-5 brand-panel">
+        <div class="brand-panel-inner">
+          <span class="brand-mark">{{ strtoupper(substr(config('app.name', 'B'), 0, 1)) }}</span>
+          <h3>Use a backup code</h3>
+          <p>Lost access to your device? Enter one of your saved backup codes to get back into {{ config('app.name') }}.</p>
         </div>
       </div>
       <!-- /Left Text-->

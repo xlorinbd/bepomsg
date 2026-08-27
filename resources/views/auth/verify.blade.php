@@ -9,6 +9,8 @@
 @section('page-style')
     {{-- Page Css files --}}
     <link rel="stylesheet" href="{{ asset(mix('css/base/pages/authentication.css')) }}">
+
+    @include('auth._brand-style')
 @endsection
 
 @section('content')
@@ -23,13 +25,11 @@
 
 
             <!-- Left Text-->
-            <div class="d-none d-lg-flex col-lg-8 align-items-center p-5">
-                <div class="w-100 d-lg-flex align-items-center justify-content-center px-5">
-                    @if($configData['theme'] === 'dark')
-                        <img class="img-fluid" src="{{asset('images/pages/login-v2-dark.svg')}}" alt="{{config('app.name')}}"/>
-                    @else
-                        <img class="img-fluid" src="{{asset('images/pages/login-v2.svg')}}" alt="{{config('app.name')}}"/>
-                    @endif
+            <div class="d-none d-lg-flex col-lg-8 align-items-center p-5 brand-panel">
+                <div class="brand-panel-inner">
+                    <span class="brand-mark">{{ strtoupper(substr(config('app.name', 'B'), 0, 1)) }}</span>
+                    <h3>Verify your email</h3>
+                    <p>Just one more step — confirm your email address to start using {{ config('app.name') }}.</p>
                 </div>
             </div>
             <!-- /Left Text-->

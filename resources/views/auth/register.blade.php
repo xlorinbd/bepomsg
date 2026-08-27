@@ -23,6 +23,9 @@ $termsOfUseData = $termsOfUse ? $termsOfUse->value : '';
     <link rel="stylesheet" href="{{ asset(mix('css/base/plugins/forms/form-validation.css')) }}">
     <link rel="stylesheet" href="{{ asset(mix('css/base/pages/authentication.css')) }}">
     <link rel="stylesheet" type="text/css" href="{{asset('css/base/pages/page-pricing.css')}}">
+
+    @include('auth._brand-style')
+
     <style>
         .modal-body img {
             max-width: 100%;
@@ -44,10 +47,16 @@ $termsOfUseData = $termsOfUse ? $termsOfUse->value : '';
             <!-- /Brand logo-->
 
             <!-- Left Text-->
-            <div class="col-lg-3 d-none d-lg-flex align-items-center p-0">
-                <div class="w-100 d-lg-flex align-items-center justify-content-center">
-                    <img class="img-fluid w-100" src="{{asset('images/pages/create-account.svg')}}"
-                        alt="{{config('app.name')}}" />
+            <div class="col-lg-3 d-none d-lg-flex align-items-center p-4 brand-panel">
+                <div class="brand-panel-inner">
+                    <span class="brand-mark">{{ strtoupper(substr(config('app.name', 'B'), 0, 1)) }}</span>
+                    <h3>Create your account</h3>
+                    <p>Join {{ config('app.name') }} and start sending bulk SMS &amp; WhatsApp campaigns in minutes.</p>
+                    <ul class="brand-highlights">
+                        <li>Free plan to get started</li>
+                        <li>No setup fees</li>
+                        <li>Upgrade any time</li>
+                    </ul>
                 </div>
             </div>
             <!-- /Left Text-->

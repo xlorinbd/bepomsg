@@ -13,6 +13,8 @@
     {{--     {!! RecaptchaV3::initJs() !!} --}}
     {{-- @endif --}}
 
+    @include('auth._brand-style')
+
     <style>
         .auth-bg {
             position: relative;
@@ -33,15 +35,16 @@
             <!-- /Brand logo-->
 
             <!-- Left Text-->
-            <div class="d-none d-lg-flex col-lg-8 align-items-center p-5">
-                <div class="w-100 d-lg-flex align-items-center justify-content-center px-5">
-                    @if($configData['theme'] === 'dark')
-                        <img class="img-fluid" src="{{asset('images/pages/login-v2-dark.svg')}}"
-                             alt="{{config('app.name')}}"/>
-                    @else
-                        <img class="img-fluid" src="{{asset('images/pages/login-v2.svg')}}"
-                             alt="{{config('app.name')}}"/>
-                    @endif
+            <div class="d-none d-lg-flex col-lg-8 align-items-center p-5 brand-panel">
+                <div class="brand-panel-inner">
+                    <span class="brand-mark">{{ strtoupper(substr(config('app.name', 'B'), 0, 1)) }}</span>
+                    <h3>{{ config('app.name') }}</h3>
+                    <p>Reach every customer with reliable bulk SMS &amp; WhatsApp marketing — send campaigns, manage contacts, and track results in real time.</p>
+                    <ul class="brand-highlights">
+                        <li>Global delivery across 190+ countries</li>
+                        <li>Real-time campaign reporting</li>
+                        <li>Developer-friendly API access</li>
+                    </ul>
                 </div>
             </div>
             <!-- /Left Text-->

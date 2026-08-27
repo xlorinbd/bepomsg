@@ -12,6 +12,8 @@
     {{-- @if(config('no-captcha.login'))
         {!! RecaptchaV3::initJs() !!}
     @endif --}}
+
+    @include('auth._brand-style')
 @endsection
 
 @section('content')
@@ -26,13 +28,11 @@
 
 
             <!-- Left Text-->
-            <div class="d-none d-lg-flex col-lg-8 align-items-center p-5">
-                <div class="w-100 d-lg-flex align-items-center justify-content-center px-5">
-                    @if($configData['theme'] === 'dark')
-                        <img class="img-fluid" src="{{asset('images/pages/forgot-password-v2-dark.svg')}}" alt="{{config('app.name')}}"/>
-                    @else
-                        <img class="img-fluid" src="{{asset('images/pages/forgot-password-v2.svg')}}" alt="{{config('app.name')}}"/>
-                    @endif
+            <div class="d-none d-lg-flex col-lg-8 align-items-center p-5 brand-panel">
+                <div class="brand-panel-inner">
+                    <span class="brand-mark">{{ strtoupper(substr(config('app.name', 'B'), 0, 1)) }}</span>
+                    <h3>Reset your password</h3>
+                    <p>No worries — enter the email on your {{ config('app.name') }} account and we'll send you a link to get back in.</p>
                 </div>
             </div>
             <!-- /Left Text-->
