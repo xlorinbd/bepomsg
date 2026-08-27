@@ -361,11 +361,11 @@
                     'type'    => 'offline_payment',
                     'options' => json_encode([
                         'payment_details'      => '<p>Please make a deposit to our bank account at:</p>
-<h6>US BANK USA</h6>
-<p>Routing (ABA): 045134400</p>
-<p>Account number: 6216587467378</p>
-<p>Beneficiary name: Ultimate sms</p>',
-                        'payment_confirmation' => 'After payment please contact with following email address codeglen@gmail.com with your transaction id. Normally it may take 1 - 2 business days to process. Should you have any question, feel free contact with us.',
+<h6>YOUR BANK NAME</h6>
+<p>Routing (ABA): 000000000</p>
+<p>Account number: 0000000000000</p>
+<p>Beneficiary name: ' . config('app.name', 'BepoMSG') . '</p>',
+                        'payment_confirmation' => 'After payment please contact with following email address support@' . strtolower(str_replace(' ', '', config('app.name', 'BepoMSG'))) . '.com with your transaction id. Normally it may take 1 - 2 business days to process. Should you have any question, feel free contact with us.',
                     ]),
                     'status'  => true,
                 ],
@@ -378,6 +378,16 @@
                         'bkash_username'   => 'Username',
                         'bkash_password'   => 'Password',
                         'environment'      => 'sandbox',
+                    ]),
+                    'status'  => false,
+                ],
+                [
+                    'name'    => 'PayStation',
+                    'type'    => PaymentMethods::TYPE_PAYSTATION,
+                    'options' => json_encode([
+                        'merchantId'  => 'Merchant ID',
+                        'password'    => 'Password',
+                        'environment' => 'sandbox',
                     ]),
                     'status'  => false,
                 ],

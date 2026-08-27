@@ -27,7 +27,7 @@
             <!-- Left Text-->
             <div class="d-none d-lg-flex col-lg-8 align-items-center p-5 brand-panel">
                 <div class="brand-panel-inner">
-                    <span class="brand-mark">{{ strtoupper(substr(config('app.name', 'B'), 0, 1)) }}</span>
+                    <span class="brand-mark"><img src="{{ asset(Helper::app_config('app_logo')) }}" alt="{{ config('app.name') }}"></span>
                     <h3>Verify your email</h3>
                     <p>Just one more step — confirm your email address to start using {{ config('app.name') }}.</p>
                 </div>

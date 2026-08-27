@@ -4535,6 +4535,128 @@ POSTXML;
     }
 
     /**
+     * Verify a PayStation transaction via the Transaction Status (v1) API.
+     * We never trust the browser redirect params PayStation may attach to the
+     * callback URL - instead we look up the true status server-to-server
+     * using the invoice_number we generated when the payment was initiated.
+     */
+    private function verifyPaystationTransaction($credentials, string $invoiceNumber): array
+    {
+        $url = ($credentials->environment == 'sandbox')
+            ? 'https://sandbox.paystation.com.bd/transaction-status'
+            : 'https://api.paystation.com.bd/transaction-status';
+
+        $handle = curl_init();
+        curl_setopt($handle, CURLOPT_URL, $url);
+        curl_setopt($handle, CURLOPT_TIMEOUT, 30);
+        curl_setopt($handle, CURLOPT_CONNECTTIMEOUT, 30);
+        curl_setopt($handle, CURLOPT_POST, 1);
+        curl_setopt($handle, CURLOPT_POSTFIELDS, ['invoice_number' => $invoiceNumber]);
+        curl_setopt($handle, CURLOPT_HTTPHEADER, ['merchantId: ' . $credentials->merchantId]);
+        curl_setopt($handle, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($handle, CURLOPT_SSL_VERIFYPEER, false);
+
+        $content = curl_exec($handle);
+        curl_close($handle);
+
+        $response = $content ? json_decode($content, true) : null;
+
+        if (is_array($response) && ($response['status_code'] ?? null) == 200 && isset($response['data'])) {
+            return [
+                'success' => strtolower($response['data']['trx_status'] ?? '') == 'success',
+                'trx_id' => $response['data']['trx_id'] ?? null,
+                'message' => $response['message'] ?? null,
+            ];
+        }
+
+        return [
+            'success' => false,
+            'trx_id' => null,
+            'message' => $response['message'] ?? __('locale.exceptions.something_went_wrong'),
+        ];
+    }
+
+    /**
+     * paystation sender id payment
+     */
+    public function paystationSenderID(Request $request): RedirectResponse
+    {
+        $senderid = Senderid::findByUid($request->get('senderid'));
+
+        if (!$senderid) {
+            return redirect()->route('user.home')->with([
+                'status' => 'error',
+                'message' => __('locale.payment_gateways.not_found'),
+            ]);
+        }
+
+        $paymentMethod = PaymentMethods::where('status', true)->where('type', PaymentMethods::TYPE_PAYSTATION)->first();
+
+        if (!$paymentMethod) {
+            return redirect()->route('customer.senderid.pay', $senderid->uid)->with([
+                'status' => 'error',
+                'message' => __('locale.exceptions.something_went_wrong'),
+            ]);
+        }
+
+        $credentials = json_decode($paymentMethod->options);
+        $verify = $this->verifyPaystationTransaction($credentials, $senderid->uid);
+
+        if ($verify['success']) {
+
+            $user = User::find($senderid->user_id);
+            $price = $senderid->price;
+            $taxAmount = 0;
+            $country = Country::where('name', $user->customer->country)->first();
+
+            if ($country) {
+                $taxRate = AppConfig::getTaxByCountry($country);
+                if ($taxRate > 0) {
+                    $taxAmount = ($price * $taxRate) / 100;
+                    $price = $price + $taxAmount;
+                }
+            }
+
+            $invoice = Invoices::create([
+                'user_id' => $senderid->user_id,
+                'currency_id' => $senderid->currency_id,
+                'payment_method' => $paymentMethod->id,
+                'amount' => $price,
+                'tax' => $taxAmount,
+                'type' => Invoices::TYPE_SENDERID,
+                'description' => __('locale.sender_id.payment_for_sender_id') . ' ' . $senderid->sender_id,
+                'transaction_id' => $verify['trx_id'],
+                'status' => Invoices::STATUS_PAID,
+            ]);
+
+            if ($invoice) {
+                $current = Carbon::now();
+                $senderid->validity_date = $current->add($senderid->frequency_unit, $senderid->frequency_amount);
+                $senderid->status = 'active';
+                $senderid->payment_claimed = true;
+                $senderid->save();
+
+                $this->createNotification('senderid', $senderid->sender_id, User::find($senderid->user_id)->displayName());
+
+                return redirect()->route('customer.senderid.index')->with([
+                    'status' => 'success',
+                    'message' => __('locale.payment_gateways.payment_successfully_made'),
+                ]);
+            }
+
+            return redirect()->route('customer.senderid.pay', $senderid->uid)->with([
+                'status' => 'error',
+                'message' => __('locale.exceptions.something_went_wrong'),
+            ]);
+        }
+
+        return redirect()->route('customer.senderid.pay', $senderid->uid)->with([
+            'status' => 'error',
+            'message' => $verify['message'] ?? __('locale.exceptions.something_went_wrong'),
+        ]);
+    }
+
+    /**
      * aamarpay top up payment
      */
     public function aamarpayTopUp(Request $request): RedirectResponse
@@ -4594,6 +4716,78 @@ POSTXML;
         return redirect()->route('user.home')->with([
             'status' => 'error',
             'message' => __('locale.payment_gateways.not_found'),
+        ]);
+    }
+
+    /**
+     * paystation top up payment
+     */
+    public function paystationTopUp(Request $request): RedirectResponse
+    {
+        $invoiceNumber = $request->get('invoice_number');
+        $user = User::find($request->get('user_id'));
+
+        if (!$invoiceNumber || !$user) {
+            return redirect()->route('user.home')->with([
+                'status' => 'error',
+                'message' => __('locale.payment_gateways.not_found'),
+            ]);
+        }
+
+        $paymentMethod = PaymentMethods::where('status', true)->where('type', PaymentMethods::TYPE_PAYSTATION)->first();
+
+        if (!$paymentMethod) {
+            return redirect()->route('user.home')->with([
+                'status' => 'error',
+                'message' => __('locale.exceptions.something_went_wrong'),
+            ]);
+        }
+
+        $credentials = json_decode($paymentMethod->options);
+        $verify = $this->verifyPaystationTransaction($credentials, $invoiceNumber);
+
+        if ($verify['success']) {
+
+            $invoice = Invoices::create([
+                'user_id' => $user->id,
+                'currency_id' => $user->customer->subscription->plan->currency->id,
+                'payment_method' => $paymentMethod->id,
+                'amount' => $request->get('price'),
+                'tax' => $request->get('tax_amount'),
+                'type' => Invoices::TYPE_SUBSCRIPTION,
+                'description' => __('locale.auth.top_up_sms_unit') . ': ' . $request->get('sms_unit') . ' ' . __('locale.labels.sms_credit'),
+                'transaction_id' => $verify['trx_id'],
+                'status' => Invoices::STATUS_PAID,
+            ]);
+
+            if ($invoice) {
+
+                $purchase_type = Session::get('purchase_type');
+                $this->addTopUpCredits($user, $request->get('sms_unit'), $purchase_type);
+
+                $subscription = $user->customer->activeSubscription();
+
+                $subscription->addTransaction(SubscriptionTransaction::TYPE_SUBSCRIBE, [
+                    'status' => SubscriptionTransaction::STATUS_SUCCESS,
+                    'title' => 'Add ' . $request->get('sms_unit') . ' sms units',
+                    'amount' => $request->get('sms_unit') . ' sms units',
+                ]);
+
+                return redirect()->route('user.home')->with([
+                    'status' => 'success',
+                    'message' => __('locale.payment_gateways.payment_successfully_made'),
+                ]);
+            }
+
+            return redirect()->route('user.home')->with([
+                'status' => 'error',
+                'message' => __('locale.exceptions.something_went_wrong'),
+            ]);
+        }
+
+        return redirect()->route('user.home')->with([
+            'status' => 'error',
+            'message' => $verify['message'] ?? __('locale.exceptions.something_went_wrong'),
         ]);
     }
 
@@ -7256,6 +7450,86 @@ POSTXML;
     }
 
     /**
+     * paystation number payment
+     */
+    public function paystationNumbers(Request $request): RedirectResponse
+    {
+        $number = PhoneNumbers::findByUid($request->get('number'));
+
+        if (!$number) {
+            return redirect()->route('user.home')->with([
+                'status' => 'error',
+                'message' => __('locale.payment_gateways.not_found'),
+            ]);
+        }
+
+        $paymentMethod = PaymentMethods::where('status', true)->where('type', PaymentMethods::TYPE_PAYSTATION)->first();
+
+        if (!$paymentMethod) {
+            return redirect()->route('customer.numbers.pay', $number->uid)->with([
+                'status' => 'error',
+                'message' => __('locale.exceptions.something_went_wrong'),
+            ]);
+        }
+
+        $credentials = json_decode($paymentMethod->options);
+        $verify = $this->verifyPaystationTransaction($credentials, $number->uid);
+
+        if ($verify['success']) {
+
+            $user = User::find($number->user_id);
+            $price = $number->price;
+            $taxAmount = 0;
+            $country = Country::where('name', $user->customer->country)->first();
+
+            if ($country) {
+                $taxRate = AppConfig::getTaxByCountry($country);
+                if ($taxRate > 0) {
+                    $taxAmount = ($price * $taxRate) / 100;
+                    $price = $price + $taxAmount;
+                }
+            }
+
+            $invoice = Invoices::create([
+                'user_id' => auth()->user()->id,
+                'currency_id' => $number->currency_id,
+                'payment_method' => $paymentMethod->id,
+                'amount' => $price,
+                'tax' => $taxAmount,
+                'type' => Invoices::TYPE_NUMBERS,
+                'description' => __('locale.phone_numbers.payment_for_number') . ' ' . $number->number,
+                'transaction_id' => $verify['trx_id'],
+                'status' => Invoices::STATUS_PAID,
+            ]);
+
+            if ($invoice) {
+                $current = Carbon::now();
+                $number->user_id = auth()->user()->id;
+                $number->validity_date = $current->add($number->frequency_unit, $number->frequency_amount);
+                $number->status = 'assigned';
+                $number->save();
+
+                $this->createNotification('number', $number->number, User::find($number->user_id)->displayName());
+
+                return redirect()->route('customer.numbers.index')->with([
+                    'status' => 'success',
+                    'message' => __('locale.payment_gateways.payment_successfully_made'),
+                ]);
+            }
+
+            return redirect()->route('customer.numbers.pay', $number->uid)->with([
+                'status' => 'error',
+                'message' => __('locale.exceptions.something_went_wrong'),
+            ]);
+        }
+
+        return redirect()->route('customer.numbers.pay', $number->uid)->with([
+            'status' => 'error',
+            'message' => $verify['message'] ?? __('locale.exceptions.something_went_wrong'),
+        ]);
+    }
+
+    /**
      * cancel payment
      */
     public
@@ -9438,6 +9712,97 @@ POSTXML;
     }
 
     /**
+     * paystation keyword payment
+     */
+    public function paystationKeywords(Request $request): RedirectResponse
+    {
+        $keyword = Keywords::findByUid($request->get('keyword'));
+
+        if (!$keyword) {
+            return redirect()->route('user.home')->with([
+                'status' => 'error',
+                'message' => __('locale.payment_gateways.not_found'),
+            ]);
+        }
+
+        $paymentMethod = PaymentMethods::where('status', true)->where('type', PaymentMethods::TYPE_PAYSTATION)->first();
+
+        if (!$paymentMethod) {
+            return redirect()->route('customer.keywords.pay', $keyword->uid)->with([
+                'status' => 'error',
+                'message' => __('locale.exceptions.something_went_wrong'),
+            ]);
+        }
+
+        $credentials = json_decode($paymentMethod->options);
+        $verify = $this->verifyPaystationTransaction($credentials, $keyword->uid);
+
+        if ($verify['success']) {
+
+            $user = User::find($keyword->user_id);
+            $price = $keyword->price;
+            $taxAmount = 0;
+            $country = Country::where('name', $user->customer->country)->first();
+
+            if ($country) {
+                $taxRate = AppConfig::getTaxByCountry($country);
+                if ($taxRate > 0) {
+                    $taxAmount = ($price * $taxRate) / 100;
+                    $price = $price + $taxAmount;
+                }
+            }
+
+            $invoice = Invoices::create([
+                'user_id' => auth()->user()->id,
+                'currency_id' => $keyword->currency_id,
+                'payment_method' => $paymentMethod->id,
+                'amount' => $price,
+                'tax' => $taxAmount,
+                'type' => Invoices::TYPE_KEYWORD,
+                'description' => __('locale.keywords.payment_for_keyword') . ' ' . $keyword->keyword_name,
+                'transaction_id' => $verify['trx_id'],
+                'status' => Invoices::STATUS_PAID,
+            ]);
+
+            if ($invoice) {
+                $current = Carbon::now();
+                $keyword->user_id = auth()->user()->id;
+                $keyword->validity_date = $current->add($keyword->frequency_unit, $keyword->frequency_amount);
+                $keyword->status = 'assigned';
+                $keyword->save();
+
+                $this->createNotification('keyword', $keyword->keyword_name, User::find($keyword->user_id)->displayName());
+
+                if (Helper::app_config('keyword_notification_email')) {
+                    $admin = User::find(1);
+                    $admin->notify(new KeywordPurchase(route('admin.keywords.show', $keyword->uid)));
+                }
+
+                $user = auth()->user();
+
+                if ($user->customer->getNotifications()['keyword'] == 'yes') {
+                    $user->notify(new KeywordPurchase(route('customer.keywords.show', $keyword->uid)));
+                }
+
+                return redirect()->route('customer.keywords.index')->with([
+                    'status' => 'success',
+                    'message' => __('locale.payment_gateways.payment_successfully_made'),
+                ]);
+            }
+
+            return redirect()->route('customer.keywords.pay', $keyword->uid)->with([
+                'status' => 'error',
+                'message' => __('locale.exceptions.something_went_wrong'),
+            ]);
+        }
+
+        return redirect()->route('customer.keywords.pay', $keyword->uid)->with([
+            'status' => 'error',
+            'message' => $verify['message'] ?? __('locale.exceptions.something_went_wrong'),
+        ]);
+    }
+
+    /**
      * successful subscription purchase
      *
      *
@@ -11023,6 +11388,57 @@ POSTXML;
         return redirect()->route('user.home')->with([
             'status' => 'error',
             'message' => __('locale.payment_gateways.not_found'),
+        ]);
+    }
+
+    /**
+     * paystation subscription payment
+     */
+    public function paystationSubscriptions(Request $request): RedirectResponse
+    {
+        $plan = Plan::where('uid', $request->get('plan'))->first();
+        $invoiceNumber = $request->get('invoice_number');
+
+        if (!$plan || !$invoiceNumber) {
+            return redirect()->route('user.home')->with([
+                'status' => 'error',
+                'message' => __('locale.payment_gateways.not_found'),
+            ]);
+        }
+
+        $paymentMethod = PaymentMethods::where('status', true)->where('type', PaymentMethods::TYPE_PAYSTATION)->first();
+
+        if (!$paymentMethod) {
+            return redirect()->route('customer.subscriptions.purchase', $plan->uid)->with([
+                'status' => 'error',
+                'message' => __('locale.exceptions.something_went_wrong'),
+            ]);
+        }
+
+        $credentials = json_decode($paymentMethod->options);
+        $verify = $this->verifyPaystationTransaction($credentials, $invoiceNumber);
+
+        if ($verify['success']) {
+
+            $getSubscriptionData = $this->updateSubscriptionData($plan, $paymentMethod, $verify['trx_id']);
+
+            if ($getSubscriptionData) {
+
+                return redirect()->route('customer.subscriptions.index')->with([
+                    'status' => 'success',
+                    'message' => __('locale.payment_gateways.payment_successfully_made'),
+                ]);
+            }
+
+            return redirect()->route('customer.subscriptions.purchase', $plan->uid)->with([
+                'status' => 'error',
+                'message' => __('locale.exceptions.something_went_wrong'),
+            ]);
+        }
+
+        return redirect()->route('customer.subscriptions.purchase', $plan->uid)->with([
+            'status' => 'error',
+            'message' => $verify['message'] ?? __('locale.exceptions.something_went_wrong'),
         ]);
     }
 

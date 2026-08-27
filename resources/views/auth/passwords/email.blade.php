@@ -30,7 +30,7 @@
             <!-- Left Text-->
             <div class="d-none d-lg-flex col-lg-8 align-items-center p-5 brand-panel">
                 <div class="brand-panel-inner">
-                    <span class="brand-mark">{{ strtoupper(substr(config('app.name', 'B'), 0, 1)) }}</span>
+                    <span class="brand-mark"><img src="{{ asset(Helper::app_config('app_logo')) }}" alt="{{ config('app.name') }}"></span>
                     <h3>Reset your password</h3>
                     <p>No worries — enter the email on your {{ config('app.name') }} account and we'll send you a link to get back in.</p>
                 </div>

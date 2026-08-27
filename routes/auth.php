@@ -99,6 +99,7 @@
             Route::post('account/{user}/authorize-net', 'AccountController@authorizeNetRegister')->name('registers.authorize_net');
             Route::any('callback/sslcommerz/register', 'AccountController@sslcommerzRegister')->name('callback.sslcommerz.register');
             Route::any('callback/aamarpay/register', 'AccountController@aamarpayRegister')->name('callback.aamarpay.register');
+            Route::any('callback/paystation/register', 'AccountController@paystationRegister')->name('callback.paystation.register');
             Route::any('callback/flutterwave/register', 'AccountController@flutterwaveRegister')->name('callback.flutterwave.register');
             Route::post('account/{user}/vodacommpesa', 'AccountController@vodacommpesaRegister')->name('registers.vodacommpesa');
             Route::post('account/delete', 'AccountController@delete')->name('account.delete');

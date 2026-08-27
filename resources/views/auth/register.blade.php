@@ -49,7 +49,7 @@ $termsOfUseData = $termsOfUse ? $termsOfUse->value : '';
             <!-- Left Text-->
             <div class="col-lg-3 d-none d-lg-flex align-items-center p-4 brand-panel">
                 <div class="brand-panel-inner">
-                    <span class="brand-mark">{{ strtoupper(substr(config('app.name', 'B'), 0, 1)) }}</span>
+                    <span class="brand-mark"><img src="{{ asset(Helper::app_config('app_logo')) }}" alt="{{ config('app.name') }}"></span>
                     <h3>Create your account</h3>
                     <p>Join {{ config('app.name') }} and start sending bulk SMS &amp; WhatsApp campaigns in minutes.</p>
                     <ul class="brand-highlights">

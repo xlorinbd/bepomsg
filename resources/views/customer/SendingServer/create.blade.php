@@ -778,7 +778,7 @@
                                         @endif
 
 
-                                        @if($server['settings'] == 'SmsGatewayMe' || $server['settings'] == 'WhatsAppChatApi' || $server['settings'] == 'SignalWire' || $server['settings'] == 'Bandwidth' || $server['settings'] == 'BroadcasterMobile' || $server['settings'] == 'GreenWebBD' || $server['settings'] == 'HablameV2' || $server['settings'] == 'CaihCom'  || $server['settings'] == 'SpoofSend' || $server['settings'] == 'AlhajSms' || $server['settings'] == 'SendroidUltimate' || $server['settings'] == 'Sinch' || $server['settings'] == 'PitchWink' || $server['settings'] == 'MaisSMS' || $server['settings'] == 'BulkSMSNigeria' || $server['settings'] == 'SMSCloudCI' || $server['settings'] == 'LifetimeSMS' || $server['settings'] == 'PARATUS' || $server['settings'] == 'LeTexto' || $server['settings'] == 'Whatsender' || $server['settings'] == 'Gatewayapi' || $server['settings'] == 'SemySMS' || $server['settings'] == 'Xmsway' || $server['settings'] == 'Inteliquent' || $server['settings'] == 'BulkGate' || $server['settings'] == 'ClearComMX' || $server['settings'] == 'CyberGateLK' || $server['settings'] == 'SMSCrab' || $server['settings'] == SendingServer::TYPE_MAILJET || $server['settings'] == SendingServer::TYPE_SMSFRL || $server['settings'] == SendingServer::TYPE_GOSMSFUN || $server['settings'] == SendingServer::TYPE_D7NETWORKS || $server['settings'] == SendingServer::TYPE_SAVEWEBHOSTNET || $server['settings'] == SendingServer::TYPE_TELEAPI || $server['settings'] == SendingServer::TYPE_PICKYASSIST || $server['settings'] == SendingServer::TYPE_8x8 || $server['settings'] == SendingServer::TYPE_WAZONE || $server['settings'] == SendingServer::TYPE_MMSCONSOLE || $server['settings'] == SendingServer::TYPE_BMSGLOBAL || $server['settings'] == SendingServer::TYPE_DATAGIFTING || $server['settings'] == SendingServer::TYPE_SMSAPIONLINE || $server['settings'] == SendingServer::TYPE_WA2SALES || $server['settings'] == SendingServer::TYPE_ULTIMATESMS || $server['settings'] == SendingServer::TYPE_BLACKSMS)
+                                        @if($server['settings'] == 'SmsGatewayMe' || $server['settings'] == 'WhatsAppChatApi' || $server['settings'] == 'SignalWire' || $server['settings'] == 'Bandwidth' || $server['settings'] == 'BroadcasterMobile' || $server['settings'] == 'GreenWebBD' || $server['settings'] == SendingServer::TYPE_BULKSMSBD || $server['settings'] == 'HablameV2' || $server['settings'] == 'CaihCom'  || $server['settings'] == 'SpoofSend' || $server['settings'] == 'AlhajSms' || $server['settings'] == 'SendroidUltimate' || $server['settings'] == 'Sinch' || $server['settings'] == 'PitchWink' || $server['settings'] == 'MaisSMS' || $server['settings'] == 'BulkSMSNigeria' || $server['settings'] == 'SMSCloudCI' || $server['settings'] == 'LifetimeSMS' || $server['settings'] == 'PARATUS' || $server['settings'] == 'LeTexto' || $server['settings'] == 'Whatsender' || $server['settings'] == 'Gatewayapi' || $server['settings'] == 'SemySMS' || $server['settings'] == 'Xmsway' || $server['settings'] == 'Inteliquent' || $server['settings'] == 'BulkGate' || $server['settings'] == 'ClearComMX' || $server['settings'] == 'CyberGateLK' || $server['settings'] == 'SMSCrab' || $server['settings'] == SendingServer::TYPE_MAILJET || $server['settings'] == SendingServer::TYPE_SMSFRL || $server['settings'] == SendingServer::TYPE_GOSMSFUN || $server['settings'] == SendingServer::TYPE_D7NETWORKS || $server['settings'] == SendingServer::TYPE_SAVEWEBHOSTNET || $server['settings'] == SendingServer::TYPE_TELEAPI || $server['settings'] == SendingServer::TYPE_PICKYASSIST || $server['settings'] == SendingServer::TYPE_8x8 || $server['settings'] == SendingServer::TYPE_WAZONE || $server['settings'] == SendingServer::TYPE_MMSCONSOLE || $server['settings'] == SendingServer::TYPE_BMSGLOBAL || $server['settings'] == SendingServer::TYPE_DATAGIFTING || $server['settings'] == SendingServer::TYPE_SMSAPIONLINE || $server['settings'] == SendingServer::TYPE_WA2SALES || $server['settings'] == SendingServer::TYPE_ULTIMATESMS || $server['settings'] == SendingServer::TYPE_BLACKSMS)
 
                                             <div class="col-12">
                                                 <div class="mb-1">
@@ -1726,6 +1726,22 @@
                                                 </div>
                                             </div>
 
+                                        @endif
+
+                                        @if($server['settings'] == SendingServer::TYPE_BULKSMSBD)
+                                            <div class="col-12">
+                                                <div class="mb-1">
+                                                    <label class="form-label required" for="c1">Sender ID</label>
+                                                    <input type="text" id="c1"
+                                                           class="form-control @error('c1') is-invalid @enderror"
+                                                           value="{{ $server['c1'] }}" name="c1" required>
+                                                    @error('c1')
+                                                    <div class="invalid-feedback">
+                                                        {{ $message }}
+                                                    </div>
+                                                    @enderror
+                                                </div>
+                                            </div>
                                         @endif
 
 

@@ -1,8 +1,17 @@
+@php
+    use App\Helpers\Helper;
+
+    $bmPrimary  = Helper::app_config('brand_primary_color') ?: '#4f46e5';
+    $bmAccent   = Helper::app_config('brand_accent_color') ?: '#06b6d4';
+    $bmPrimaryD = Helper::hexShade($bmPrimary, -12);
+    $bmPrimaryRgb = Helper::hexToRgbTriplet($bmPrimary);
+    $bmAccentRgb = Helper::hexToRgbTriplet($bmAccent);
+@endphp
 <style>
     :root {
-        --auth-primary: #4f46e5;
-        --auth-primary-dark: #4338ca;
-        --auth-accent: #06b6d4;
+        --auth-primary: {{ $bmPrimary }};
+        --auth-primary-dark: {{ $bmPrimaryD }};
+        --auth-accent: {{ $bmAccent }};
         --auth-ink: #0f1729;
     }
 
@@ -23,8 +32,8 @@
         position: absolute;
         inset: 0;
         background:
-            radial-gradient(600px 300px at 15% 20%, rgba(79, 70, 229, 0.35), transparent 60%),
-            radial-gradient(500px 260px at 85% 80%, rgba(6, 182, 212, 0.28), transparent 60%);
+            radial-gradient(600px 300px at 15% 20%, rgba({{ $bmPrimaryRgb }}, 0.35), transparent 60%),
+            radial-gradient(500px 260px at 85% 80%, rgba({{ $bmAccentRgb }}, 0.28), transparent 60%);
         pointer-events: none;
     }
 
@@ -40,13 +49,18 @@
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        width: 56px;
-        height: 56px;
-        border-radius: 16px;
-        background: linear-gradient(135deg, var(--auth-primary), var(--auth-accent));
-        font-weight: 800;
-        font-size: 24px;
+        height: 52px;
+        padding: 10px 18px;
+        border-radius: 10px;
+        background: #fff;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
         margin-bottom: 28px;
+    }
+
+    .brand-panel .brand-mark img {
+        max-height: 32px;
+        width: auto;
+        display: block;
     }
 
     .brand-panel h3 {
@@ -87,7 +101,7 @@
         width: 20px;
         height: 20px;
         border-radius: 50%;
-        background: rgba(6, 182, 212, 0.18);
+        background: rgba({{ $bmAccentRgb }}, 0.18);
         color: #67e8f9;
         font-size: 11px;
         display: flex;
@@ -106,24 +120,24 @@
     }
 
     .auth-bg .form-control {
-        border-radius: 10px;
-        border-color: #e6e8f0;
+        border-radius: 6px;
+        border-color: #e4e4e7;
         padding: 0.65rem 1rem;
     }
 
     .auth-bg .form-control:focus {
         border-color: var(--auth-primary);
-        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.12);
+        box-shadow: 0 0 0 3px rgba({{ $bmPrimaryRgb }}, 0.12);
     }
 
     .auth-bg .btn-primary,
     .btn-submit {
         background: var(--auth-primary) !important;
         border-color: var(--auth-primary) !important;
-        border-radius: 10px !important;
+        border-radius: 6px !important;
         padding: 0.7rem 1rem !important;
-        font-weight: 700 !important;
-        box-shadow: 0 8px 20px rgba(79, 70, 229, 0.28);
+        font-weight: 600 !important;
+        box-shadow: none !important;
     }
 
     .auth-bg .btn-primary:hover,

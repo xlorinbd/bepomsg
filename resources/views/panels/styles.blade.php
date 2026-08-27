@@ -42,6 +42,8 @@
     <link rel="stylesheet" href="{{ asset(mix('css/style.css')) }}"/>
 @endif
 
+@include('panels/_brand_dynamic_style')
+
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+Bengali:wght@300;400;500;600;700&display=swap');
 

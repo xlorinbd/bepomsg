@@ -10,15 +10,26 @@
       0 => 'ArielMejiaDev\\LarapexCharts\\LarapexChartsServiceProvider',
     ),
   ),
-  'intervention/image' => 
+  'barryvdh/laravel-debugbar' => 
   array (
+    'aliases' => 
+    array (
+      'Debugbar' => 'Barryvdh\\Debugbar\\Facades\\Debugbar',
+    ),
     'providers' => 
     array (
-      0 => 'Intervention\\Image\\ImageServiceProvider',
+      0 => 'Barryvdh\\Debugbar\\ServiceProvider',
     ),
+  ),
+  'intervention/image' => 
+  array (
     'aliases' => 
     array (
       'Image' => 'Intervention\\Image\\Facades\\Image',
+    ),
+    'providers' => 
+    array (
+      0 => 'Intervention\\Image\\ImageServiceProvider',
     ),
   ),
   'josiasmontag/laravel-recaptchav3' => 
@@ -43,6 +54,17 @@
       0 => 'Karim007\\LaravelBkashTokenize\\BkashTokenizeServiceProvider',
     ),
   ),
+  'laravel/horizon' => 
+  array (
+    'aliases' => 
+    array (
+      'Horizon' => 'Laravel\\Horizon\\Horizon',
+    ),
+    'providers' => 
+    array (
+      0 => 'Laravel\\Horizon\\HorizonServiceProvider',
+    ),
+  ),
   'laravel/legacy-factories' => 
   array (
     'providers' => 
@@ -50,11 +72,25 @@
       0 => 'Illuminate\\Database\\Eloquent\\LegacyFactoryServiceProvider',
     ),
   ),
+  'laravel/sail' => 
+  array (
+    'providers' => 
+    array (
+      0 => 'Laravel\\Sail\\SailServiceProvider',
+    ),
+  ),
   'laravel/sanctum' => 
   array (
     'providers' => 
     array (
       0 => 'Laravel\\Sanctum\\SanctumServiceProvider',
+    ),
+  ),
+  'laravel/sentinel' => 
+  array (
+    'providers' => 
+    array (
+      0 => 'Laravel\\Sentinel\\SentinelServiceProvider',
     ),
   ),
   'laravel/socialite' => 
@@ -111,6 +147,13 @@
       0 => 'Carbon\\Laravel\\ServiceProvider',
     ),
   ),
+  'nunomaduro/collision' => 
+  array (
+    'providers' => 
+    array (
+      0 => 'NunoMaduro\\Collision\\Adapters\\Laravel\\CollisionServiceProvider',
+    ),
+  ),
   'nunomaduro/termwind' => 
   array (
     'providers' => 
@@ -134,6 +177,17 @@
     'providers' => 
     array (
       0 => 'Spatie\\Html\\HtmlServiceProvider',
+    ),
+  ),
+  'spatie/laravel-ignition' => 
+  array (
+    'aliases' => 
+    array (
+      'Flare' => 'Spatie\\LaravelIgnition\\Facades\\Flare',
+    ),
+    'providers' => 
+    array (
+      0 => 'Spatie\\LaravelIgnition\\IgnitionServiceProvider',
     ),
   ),
   'spatie/laravel-translatable' => 

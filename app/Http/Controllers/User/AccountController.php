@@ -3476,6 +3476,162 @@ POSTXML;
             ]);
         }
 
+        /**
+         * Verify a PayStation transaction via the Transaction Status (v1) API.
+         * We never trust the browser redirect params PayStation may attach to the
+         * callback URL - instead we look up the true status server-to-server
+         * using the invoice_number we generated when the payment was initiated.
+         */
+        private function verifyPaystationTransaction($credentials, string $invoiceNumber): array
+        {
+            $url = ($credentials->environment == 'sandbox')
+                ? 'https://sandbox.paystation.com.bd/transaction-status'
+                : 'https://api.paystation.com.bd/transaction-status';
+
+            $handle = curl_init();
+            curl_setopt($handle, CURLOPT_URL, $url);
+            curl_setopt($handle, CURLOPT_TIMEOUT, 30);
+            curl_setopt($handle, CURLOPT_CONNECTTIMEOUT, 30);
+            curl_setopt($handle, CURLOPT_POST, 1);
+            curl_setopt($handle, CURLOPT_POSTFIELDS, ['invoice_number' => $invoiceNumber]);
+            curl_setopt($handle, CURLOPT_HTTPHEADER, ['merchantId: ' . $credentials->merchantId]);
+            curl_setopt($handle, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($handle, CURLOPT_SSL_VERIFYPEER, false);
+
+            $content = curl_exec($handle);
+            curl_close($handle);
+
+            $response = $content ? json_decode($content, true) : null;
+
+            if (is_array($response) && ($response['status_code'] ?? null) == 200 && isset($response['data'])) {
+                return [
+                    'success' => strtolower($response['data']['trx_status'] ?? '') == 'success',
+                    'trx_id'  => $response['data']['trx_id'] ?? null,
+                    'message' => $response['message'] ?? null,
+                ];
+            }
+
+            return [
+                'success' => false,
+                'trx_id'  => null,
+                'message' => $response['message'] ?? __('locale.exceptions.something_went_wrong'),
+            ];
+        }
+
+        /**
+         * paystation registration subscription payment
+         */
+        public function paystationRegister(Request $request): RedirectResponse
+        {
+            $plan = Plan::where('uid', $request->plan)->first();
+            $user = User::where('uid', $request->user)->first();
+
+            if (!$plan || !$user) {
+                return redirect()->route('user.home')->with([
+                    'status'  => 'error',
+                    'message' => __('locale.payment_gateways.not_found'),
+                ]);
+            }
+
+            $paymentMethod = PaymentMethods::where('status', true)->where('type', PaymentMethods::TYPE_PAYSTATION)->first();
+
+            if (!$paymentMethod) {
+                $user->delete();
+
+                return redirect()->route('user.home')->with([
+                    'status'  => 'error',
+                    'message' => __('locale.exceptions.something_went_wrong'),
+                ]);
+            }
+
+            $credentials   = json_decode($paymentMethod->options);
+            $invoiceNumber = $user->uid . '-' . $plan->uid;
+            $verify        = $this->verifyPaystationTransaction($credentials, $invoiceNumber);
+
+            if ($verify['success']) {
+
+                $country   = Country::where('name', $user->customer->country)->first();
+                $price     = $plan->price;
+                $taxAmount = 0;
+
+                if ($country) {
+                    $taxRate = AppConfig::getTaxByCountry($country);
+                    if ($taxRate > 0) {
+                        $taxAmount = ($price * $taxRate) / 100;
+                        $price     = $price + $taxAmount;
+                    }
+                }
+
+                $invoice = Invoices::create([
+                    'user_id'        => $user->id,
+                    'currency_id'    => $plan->currency_id,
+                    'payment_method' => $paymentMethod->id,
+                    'amount'         => $price,
+                    'tax'            => $taxAmount,
+                    'type'           => Invoices::TYPE_SUBSCRIPTION,
+                    'description'    => __('locale.subscription.payment_for_plan') . ' ' . $plan->name,
+                    'transaction_id' => $verify['trx_id'],
+                    'status'         => Invoices::STATUS_PAID,
+                ]);
+
+                if ($invoice) {
+
+                    $subscription                         = new Subscription();
+                    $subscription->user_id                = $user->id;
+                    $subscription->start_at               = Carbon::now();
+                    $subscription->status                 = Subscription::STATUS_ACTIVE;
+                    $subscription->plan_id                = $plan->getBillableId();
+                    $subscription->end_period_last_days   = '10';
+                    $subscription->current_period_ends_at = $subscription->getPeriodEndsAt(Carbon::now());
+                    $subscription->end_at                 = null;
+                    $subscription->end_by                 = null;
+                    $subscription->payment_method_id      = $paymentMethod->id;
+                    $subscription->save();
+
+                    // add transaction
+                    $subscription->addTransaction(SubscriptionTransaction::TYPE_SUBSCRIBE, [
+                        'end_at'                 => $subscription->end_at,
+                        'current_period_ends_at' => $subscription->current_period_ends_at,
+                        'status'                 => SubscriptionTransaction::STATUS_SUCCESS,
+                        'title'                  => trans('locale.subscription.subscribed_to_plan', ['plan' => $subscription->plan->getBillableName()]),
+                        'amount'                 => $subscription->plan->getBillableFormattedPrice(),
+                    ]);
+
+                    // add log
+                    $subscription->addLog(SubscriptionLog::TYPE_ADMIN_PLAN_ASSIGNED, [
+                        'plan'  => $subscription->plan->getBillableName(),
+                        'price' => $subscription->plan->getBillableFormattedPrice(),
+                    ]);
+
+                    $user->sms_unit          = $plan->getOption('sms_max');
+                    $user->email_verified_at = Carbon::now();
+                    $user->save();
+
+                    $this->sendWelcomeEmail($user);
+
+                    //Add default Sender id
+                    $this->planSenderID($plan, $user);
+
+                    return redirect()->route('user.home')->with([
+                        'status'  => 'success',
+                        'message' => __('locale.payment_gateways.payment_successfully_made'),
+                    ]);
+                }
+
+                return redirect()->route('register')->with([
+                    'status'  => 'error',
+                    'message' => __('locale.exceptions.something_went_wrong'),
+                ]);
+            }
+
+            $user->delete();
+
+            return redirect()->route('register')->with([
+                'status'  => 'error',
+                'message' => $verify['message'] ?? __('locale.exceptions.something_went_wrong'),
+            ]);
+        }
+
         /*Version 3.3*/
 
         public function sendWelcomeEmail($user)

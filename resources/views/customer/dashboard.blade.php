@@ -704,7 +704,7 @@
                 stroke: {
                     width: 4
                 },
-                colors: ["#7367F0", "#EA5455"]
+                colors: ["#4F46E5", "#EA5455"]
             };
 
             let smsHistoryChart = new ApexCharts(

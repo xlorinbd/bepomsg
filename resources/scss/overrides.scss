@@ -11,3 +11,158 @@
         }
     }
 }
+
+// =====================================================================
+// BepoMSG brand shell — shadcn/ui-inspired restyle of the shared
+// admin/customer app chrome (sidebar, navbar, cards, buttons, forms).
+// Flat neutral surfaces, hairline borders, no gradients/glow — a
+// single accent color used sparingly, everything else greyscale.
+// =====================================================================
+
+:root {
+    --bm-primary: #4f46e5;
+    --bm-primary-dark: #4338ca;
+    --bm-accent: #06b6d4;
+
+    // Neutral (zinc) scale — shadcn's default palette
+    --bm-ink: #18181b;         // foreground
+    --bm-ink-soft: #71717a;    // muted-foreground
+    --bm-border: #e4e4e7;      // border
+    --bm-surface: #ffffff;     // card / popover
+    --bm-surface-soft: #f4f4f5; // muted background
+    --bm-radius: 0.625rem;     // ~10px, shadcn's default --radius
+}
+
+body {
+    background-color: var(--bm-surface-soft);
+    -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4, h5, h6, .card-title {
+    color: var(--bm-ink);
+    letter-spacing: -0.01em;
+}
+
+// ---- Top navbar: flat white bar, hairline bottom border, no glow. ----
+.header-navbar {
+    background-color: var(--bm-surface) !important;
+    box-shadow: none !important;
+    border-bottom: 1px solid var(--bm-border);
+
+    .navbar-container {
+        .nav-link,
+        .navbar-nav .nav-item > a {
+            color: var(--bm-ink) !important;
+        }
+    }
+}
+
+.navbar-shadow:after {
+    display: none !important;
+}
+
+// ---- Sidebar: flat white surface, hairline right border. Active ----
+// ---- item = tinted muted background + left accent bar, no fill. ----
+.main-menu {
+    background-color: var(--bm-surface) !important;
+    border-right: 1px solid var(--bm-border);
+    box-shadow: none !important;
+
+    .navbar-header {
+        background-color: var(--bm-surface) !important;
+        border-bottom: 1px solid var(--bm-border);
+    }
+
+    .main-menu-content {
+        background-color: var(--bm-surface) !important;
+    }
+
+    .navigation {
+        padding: 8px 10px;
+
+        > li {
+            margin-bottom: 1px;
+
+            > a {
+                border-radius: 6px !important;
+                color: var(--bm-ink-soft) !important;
+                font-weight: 500;
+                border-left: 2px solid transparent;
+                transition: background-color .15s ease, color .15s ease;
+
+                i, svg {
+                    color: var(--bm-ink-soft) !important;
+                }
+            }
+
+            &:hover > a {
+                background: var(--bm-surface-soft) !important;
+                color: var(--bm-ink) !important;
+
+                i, svg { color: var(--bm-ink) !important; }
+            }
+
+            &.active > a,
+            &.sidebar-group-active > a.active {
+                background: var(--bm-surface-soft) !important;
+                color: var(--bm-primary) !important;
+                border-left-color: var(--bm-primary);
+                box-shadow: none !important;
+
+                i, svg { color: var(--bm-primary) !important; }
+            }
+        }
+
+        .navigation-header {
+            color: var(--bm-ink-soft) !important;
+            opacity: .8;
+            font-weight: 600;
+            font-size: 11px;
+            letter-spacing: .05em;
+        }
+    }
+}
+
+.vertical-overlay-menu .main-menu,
+.vertical-layout.vertical-menu-modern .main-menu {
+    background-color: var(--bm-surface) !important;
+}
+
+// ---- Cards & widgets: hairline border, minimal shadow. ----
+.card {
+    border-radius: var(--bm-radius) !important;
+    border: 1px solid var(--bm-border);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03) !important;
+}
+
+.card .card-header {
+    border-bottom: 1px solid var(--bm-border);
+}
+
+// ---- Breadcrumb: quiet, accent only on the active link. ----
+.content-header-title {
+    color: var(--bm-ink);
+    font-weight: 700;
+}
+
+.breadcrumb .breadcrumb-item a {
+    color: var(--bm-ink-soft);
+}
+
+// ---- Buttons: tighter corner radius, no colored glow shadow. ----
+.btn {
+    border-radius: 6px;
+    box-shadow: none !important;
+}
+
+.badge {
+    border-radius: 9999px;
+    font-weight: 500;
+}
+
+// ---- Inputs: subtle border, no heavy focus ring. ----
+.form-control,
+.form-select {
+    border-radius: 6px;
+    border-color: var(--bm-border);
+}

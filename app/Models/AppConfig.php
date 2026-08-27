@@ -99,6 +99,14 @@ class AppConfig extends Model
                 'value' => 'images/logo/428eedaaee070f72c0a4f14aa08be0c4.png',
             ],
             [
+                'setting' => 'brand_primary_color',
+                'value' => '#4f46e5',
+            ],
+            [
+                'setting' => 'brand_accent_color',
+                'value' => '#06b6d4',
+            ],
+            [
                 'setting' => 'country',
                 'value' => 'Bangladesh',
             ],

@@ -74,7 +74,7 @@
                     </div>
 
 
-                    {{--   using on select message like sms template in ultimate sms     --}}
+                    {{--   used to select a message from saved SMS templates     --}}
                     <div class="row">
                         <div class="col-12">
                             <div class="mb-1">

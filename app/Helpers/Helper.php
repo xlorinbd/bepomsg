@@ -270,6 +270,40 @@ class Helper
     }
 
     /**
+     * Darken (or lighten with a negative percent) a hex color.
+     */
+    public static function hexShade(string $hex, int $percent): string
+    {
+        $hex = ltrim($hex, '#');
+        if (strlen($hex) === 3) {
+            $hex = $hex[0].$hex[0].$hex[1].$hex[1].$hex[2].$hex[2];
+        }
+        if (strlen($hex) !== 6 || !ctype_xdigit($hex)) {
+            return '#'.str_pad($hex, 6, '0');
+        }
+
+        $rgb = array_map(fn ($channel) => max(0, min(255, (int) hexdec($channel) + (int) round(255 * ($percent / 100)))), str_split($hex, 2));
+
+        return sprintf('#%02x%02x%02x', ...$rgb);
+    }
+
+    /**
+     * Convert a hex color to an "r, g, b" string for use inside rgba().
+     */
+    public static function hexToRgbTriplet(string $hex): string
+    {
+        $hex = ltrim($hex, '#');
+        if (strlen($hex) === 3) {
+            $hex = $hex[0].$hex[0].$hex[1].$hex[1].$hex[2].$hex[2];
+        }
+        if (strlen($hex) !== 6 || !ctype_xdigit($hex)) {
+            return '79, 70, 229';
+        }
+
+        return implode(', ', array_map('hexdec', str_split($hex, 2)));
+    }
+
+    /**
      * Get all countries.
      */
     public static function countries(): array

@@ -1350,7 +1350,7 @@ return [
 
                 'sending_speed' => "아래 설정은 SMS 발송 속도에 제한을 두는 것을 허용합니다. 예를 들어, <code> 5분마다 500개의 SMS를 제한</code>하려면, <code> 발송 제한 = 500, 시간 값 = 5, 시간 단위 = 분 </code>으로 설정하면 됩니다.",
 
-                'max_process' => "<code>Ultimate SMS</code>는 여러 프로세스를 분기하여 SMS 처리를 더 빠르게 지원합니다. 그러나 이는 CPU와 메모리를 더 많이 소비하는 대신 더 빠른 처리량을 제공합니다.",
+                'max_process' => "<code>BepoMSG</code>는 여러 프로세스를 분기하여 SMS 처리를 더 빠르게 지원합니다. 그러나 이는 CPU와 메모리를 더 많이 소비하는 대신 더 빠른 처리량을 제공합니다.",
 
                 'custom_sending_credit' => "아래 설정은 SMS 발송 속도에 제한을 두는 것을 허용합니다. 예를 들어, <code> 5분마다 500개의 SMS를 제한</code>하려면, <code> 발송 제한 = 500, 시간 값 = 5, 시간 단위 = 분 </code>으로 설정하면 됩니다. <code>단일 요청당 SMS 수</code>를 <code>1</code>보다 크게 설정하면, 여러 개의 SMS를 보낼 때 <code>구분자</code>를 선택해야 합니다.",
 
@@ -1429,13 +1429,13 @@ return [
 
                 'system_email' => '<code>트랜잭션 이메일</code>과 같은 시스템에서 보내는 이메일 서비스를 구성합니다. 이 서비스는 사용자 확인, 애플리케이션 알림, 결제 확인 등의 목적으로 사용됩니다.',
 
-                'captcha' => '<code>reCAPTCHA</code>는 <code>Google</code>에서 개발한 스팸과 남용으로부터 사이트를 보호하는 무료 서비스입니다. 따라서 먼저 Google 계정이 필요합니다. Google 계정이 없는 경우 <a href="https://accounts.google.com/SignUp" target="_blank">Google 계정 만들기</a>를 클릭하세요. Google 계정이 있으면 <a href="https://www.google.com/recaptcha/admin" target="_blank">reCaptcha Admin</a> 페이지에 로그인하고 애플리케이션 설치 URL을 설정하세요. 자세한 내용은 <a href="https://ultimatesms.codeglen.com/setting-up-google-recaptcha-with-our-ultimate-sms/" target
+                'captcha' => '<code>reCAPTCHA</code>는 <code>Google</code>에서 개발한 스팸과 남용으로부터 사이트를 보호하는 무료 서비스입니다. 따라서 먼저 Google 계정이 필요합니다. Google 계정이 없는 경우 <a href="https://accounts.google.com/SignUp" target="_blank">Google 계정 만들기</a>를 클릭하세요. Google 계정이 있으면 <a href="https://www.google.com/recaptcha/admin" target="_blank">reCaptcha Admin</a> 페이지에 로그인하고 애플리케이션 설치 URL을 설정하세요. 자세한 내용은 <a href="https://reCAPTCHA-help.example.com/" target
 
-                ="_blank">Ultimate SMS 블로그</a>를 확인하세요.',
+                ="_blank">BepoMSG 블로그</a>를 확인하세요.',
 
                 'pusher' => '<code>Pusher Account</code>가 없는 경우 먼저 무료 <code>Pusher</code> 계정을 <a href="https://pusher.com/signup" target="_blank">Pusher 가입</a> 페이지에서 만든 다음 <a href="https://dashboard.pusher.com/accounts/sign_in" target="_blank">로그인</a>하여 대시보드에서 <code>create app</code> 버튼을 클릭하세요. 그런 다음 앱 이름을 입력하고 클러스터를 선택하고 <code>front-end tech</code> 옵션으로 <code>jQuery</code>를 선택하고 <code>back-end tech</code> 옵션으로 <code>Laravel</code>을 선택하세요. 마지막으로 <code>App Keys</code> 옵션으로 이동하여 자격 증명을 업데이트하세요. ',
 
-                'background_jobs' => '<code>cPanel</code> 기반 애플리케이션에서 <code>cron 작업 또는 백그라운드 작업</code>을 실행하려면 <code>* * * * *</code>를 제외한 다음 명령을 복사하여 cPanel에 로그인하고 상단의 검색 필드에서 <code>Cron Jobs</code>를 검색하세요. 그런 다음 Cron Jobs 옵션을 클릭하고 공통 설정 드롭다운에서 <code>Every minutes</code> 옵션을 선택하세요. <code>Plesk</code> 기반 호스팅의 경우 오른쪽에서 <code>Scheduled Tasks</code>를 선택하고 <code>Add Task</code> 버튼을 클릭하세요. 그런 다음 <code>Run a PHP script</code> 옵션을 선택하고 파일 폴더를 엽니다. 그런 다음 ultimate SMS 설치 폴더로 이동하여 <code>artisan</code> 파일을 선택하세요. 그런 다음 인수 필드에 <code>schedule:run</code>을 삽입하세요. 마지막으로 PHP 버전과 <code>run dropdown</code>에서 <code>cron style</code>을 선택하고 <code>* * * * *</code>를 삽입하세요. <code>클라우드 또는 VPS</code> 기반 호스팅의 경우 터미널 또는 Bash를 열고 <code>Ubuntu 또는 Debian</code> 운영 체제의 경우 <code>crontab -e</code>를 입력하고 <code>Centos</code> 운영 체제의 경우 <code>sudo nano /etc/crontab</code>를 입력하세요. 그런 다음 다음 명령을 Crontab 파일에 삽입하세요.',
+                'background_jobs' => '<code>cPanel</code> 기반 애플리케이션에서 <code>cron 작업 또는 백그라운드 작업</code>을 실행하려면 <code>* * * * *</code>를 제외한 다음 명령을 복사하여 cPanel에 로그인하고 상단의 검색 필드에서 <code>Cron Jobs</code>를 검색하세요. 그런 다음 Cron Jobs 옵션을 클릭하고 공통 설정 드롭다운에서 <code>Every minutes</code> 옵션을 선택하세요. <code>Plesk</code> 기반 호스팅의 경우 오른쪽에서 <code>Scheduled Tasks</code>를 선택하고 <code>Add Task</code> 버튼을 클릭하세요. 그런 다음 <code>Run a PHP script</code> 옵션을 선택하고 파일 폴더를 엽니다. 그런 다음 BepoMSG 설치 폴더로 이동하여 <code>artisan</code> 파일을 선택하세요. 그런 다음 인수 필드에 <code>schedule:run</code>을 삽입하세요. 마지막으로 PHP 버전과 <code>run dropdown</code>에서 <code>cron style</code>을 선택하고 <code>* * * * *</code>를 삽입하세요. <code>클라우드 또는 VPS</code> 기반 호스팅의 경우 터미널 또는 Bash를 열고 <code>Ubuntu 또는 Debian</code> 운영 체제의 경우 <code>crontab -e</code>를 입력하고 <code>Centos</code> 운영 체제의 경우 <code>sudo nano /etc/crontab</code>를 입력하세요. 그런 다음 다음 명령을 Crontab 파일에 삽입하세요.',
 
                 'available_tags' => '필수 태그는 이메일 템플릿 편집기에 있어야 합니다.',
 

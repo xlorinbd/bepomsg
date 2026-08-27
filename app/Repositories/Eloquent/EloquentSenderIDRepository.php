@@ -969,6 +969,65 @@ class EloquentSenderIDRepository extends EloquentBaseRepository implements Sende
                     $checkout->gw_submit();
                     exit();
 
+                case PaymentMethods::TYPE_PAYSTATION:
+
+                    $post_data = [];
+                    $post_data['merchantId'] = $credentials->merchantId;
+                    $post_data['password'] = $credentials->password;
+                    $post_data['invoice_number'] = $senderid->uid;
+                    $post_data['currency'] = $senderid->currency->code;
+                    $post_data['payment_amount'] = $price;
+                    $post_data['cust_name'] = $input['first_name'];
+                    $post_data['cust_email'] = $input['email'];
+                    $post_data['cust_address'] = $input['address'];
+                    $post_data['cust_phone'] = $input['phone'];
+                    $post_data['reference'] = __('locale.sender_id.payment_for_sender_id') . ' ' . $senderid->sender_id;
+                    $post_data['checkout_items'] = __('locale.sender_id.payment_for_sender_id') . ' ' . $senderid->sender_id;
+                    $post_data['callback_url'] = route('customer.callback.paystation.senderid', ['senderid' => $senderid->uid]);
+
+                    $direct_api_url = ($credentials->environment == 'sandbox')
+                        ? 'https://sandbox.paystation.com.bd/initiate-payment'
+                        : 'https://api.paystation.com.bd/initiate-payment';
+
+                    $handle = curl_init();
+                    curl_setopt($handle, CURLOPT_URL, $direct_api_url);
+                    curl_setopt($handle, CURLOPT_TIMEOUT, 30);
+                    curl_setopt($handle, CURLOPT_CONNECTTIMEOUT, 30);
+                    curl_setopt($handle, CURLOPT_POST, 1);
+                    curl_setopt($handle, CURLOPT_POSTFIELDS, $post_data);
+                    curl_setopt($handle, CURLOPT_RETURNTRANSFER, true);
+                    curl_setopt($handle, CURLOPT_HTTPHEADER, ['Accept: application/json']);
+                    curl_setopt($handle, CURLOPT_SSL_VERIFYPEER, false); // KEEP IT FALSE IF YOU RUN FROM LOCAL PC
+
+                    $content = curl_exec($handle);
+                    $code = curl_getinfo($handle, CURLINFO_HTTP_CODE);
+
+                    if ($code == 200 && !(curl_errno($handle))) {
+                        curl_close($handle);
+                        $response = json_decode($content, true);
+
+                        if (isset($response['payment_url']) && $response['payment_url'] != '') {
+
+                            return response()->json([
+                                'status' => 'success',
+                                'redirect_url' => $response['payment_url'],
+                            ]);
+
+                        } else {
+                            return response()->json([
+                                'status' => 'error',
+                                'message' => $response['message'] ?? 'FAILED TO CONNECT WITH PAYSTATION API',
+                            ]);
+                        }
+                    } else {
+                        curl_close($handle);
+
+                        return response()->json([
+                            'status' => 'error',
+                            'message' => 'FAILED TO CONNECT WITH PAYSTATION API',
+                        ]);
+                    }
+
                 case PaymentMethods::TYPE_FLUTTERWAVE:
 
                     $checkout = new Flutterwave();

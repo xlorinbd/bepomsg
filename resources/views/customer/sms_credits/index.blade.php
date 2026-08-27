@@ -27,8 +27,8 @@
             cursor: pointer;
             transition: all 0.2s;
         }
-        .tier-card:hover { border-color: #7367f0; box-shadow: 0 4px 12px 0 rgba(115, 103, 240, 0.1); }
-        .tier-card.active { border-color: #7367f0; background-color: #f8f7ff; }
+        .tier-card:hover { border-color: #4F46E5; box-shadow: 0 4px 12px 0 rgba(115, 103, 240, 0.1); }
+        .tier-card.active { border-color: #4F46E5; background-color: #f8f7ff; }
         
         @media (max-width: 768px) {
             .pricing-table-desktop { display: none; }
@@ -48,8 +48,8 @@
             display: block;
             margin-bottom: 0.75rem;
         }
-        .payment-list-item:hover { border-color: #7367f0 !important; transform: translateX(5px); }
-        .custom-option-item-check:checked+.payment-list-item { border-color: #7367f0 !important; background-color: rgba(115, 103, 240, 0.05); }
+        .payment-list-item:hover { border-color: #4F46E5 !important; transform: translateX(5px); }
+        .custom-option-item-check:checked+.payment-list-item { border-color: #4F46E5 !important; background-color: rgba(115, 103, 240, 0.05); }
     </style>
 @endsection
 

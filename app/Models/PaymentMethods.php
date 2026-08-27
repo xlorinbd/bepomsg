@@ -54,6 +54,7 @@ class PaymentMethods extends Model
     const TYPE_MYFATOORAH = 'myFatoorah';
     const TYPE_MAYA = 'maya';
     const TYPE_BKASH = 'bkash';
+    const TYPE_PAYSTATION = 'paystation';
 
     /**
      * The attributes that are mass assignable.

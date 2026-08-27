@@ -792,6 +792,57 @@
                                                     @enderror
                                                 </div>
                                             </div>
+
+                                        @elseif($gateway->type == PaymentMethods::TYPE_PAYSTATION)
+
+                                            <div class="col-12">
+                                                <div class="mb-1">
+                                                    <label for="environment"
+                                                           class="form-label required">{{ __('locale.labels.environment') }}</label>
+                                                    <select class="form-select" name="environment" id="environment">
+                                                        <option value="sandbox"
+                                                                @if($gateway->getOption('environment') == 'sandbox' ) selected @endif>{{ __('locale.labels.sandbox') }}</option>
+                                                        <option value="production"
+                                                                @if($gateway->getOption('environment') == 'production' ) selected @endif>{{ __('locale.labels.production')}} </option>
+                                                    </select>
+                                                    @error('environment')
+                                                    <div class="text-danger">
+                                                        {{ $message }}
+                                                    </div>
+                                                    @enderror
+                                                </div>
+                                            </div>
+
+                                            <div class="col-12">
+                                                <div class="mb-1">
+                                                    <label for="merchantId"
+                                                           class="form-label required">{{ __('locale.labels.store_id') }}</label>
+                                                    <input type="text" id="merchantId" name="merchantId"
+                                                           class="form-control"
+                                                           value="{{ $gateway->getOption('merchantId') }}" required>
+                                                    @error('merchantId')
+                                                    <div class="text-danger">
+                                                        {{ $message }}
+                                                    </div>
+                                                    @enderror
+                                                </div>
+                                            </div>
+
+                                            <div class="col-12">
+                                                <div class="mb-1">
+                                                    <label for="password"
+                                                           class="form-label required">{{ __('locale.labels.store_password') }}</label>
+                                                    <input type="text" id="password" name="password"
+                                                           class="form-control"
+                                                           value="{{ $gateway->getOption('password') }}" required>
+                                                    @error('password')
+                                                    <div class="text-danger">
+                                                        {{ $message }}
+                                                    </div>
+                                                    @enderror
+                                                </div>
+                                            </div>
+
                                         @elseif($gateway->type == PaymentMethods::TYPE_FLUTTERWAVE || $gateway->type == PaymentMethods::TYPE_MAYA)
 
                                             <div class="col-12">

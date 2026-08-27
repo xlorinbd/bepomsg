@@ -89,6 +89,22 @@
                     </div>
                 </div>
 
+                <div class="col-md-6">
+                    <div class="mb-1">
+                        <label for="brand_primary_color" class="form-label">Brand Primary Color</label>
+                        <input type="color" name="brand_primary_color" class="form-control form-control-color w-100" id="brand_primary_color" value="{{ Helper::app_config('brand_primary_color') ?: '#4f46e5' }}"/>
+                        <p><small class="text-primary">Main accent color used across buttons, sidebar, and links.</small></p>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="mb-1">
+                        <label for="brand_accent_color" class="form-label">Brand Accent Color</label>
+                        <input type="color" name="brand_accent_color" class="form-control form-control-color w-100" id="brand_accent_color" value="{{ Helper::app_config('brand_accent_color') ?: '#06b6d4' }}"/>
+                        <p><small class="text-primary">Secondary color used for highlights and info states.</small></p>
+                    </div>
+                </div>
+
 
                 <div class="col-12">
                     <div class="mb-1">

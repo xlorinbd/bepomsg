@@ -102,6 +102,12 @@
                     $rules['api_token'] = 'required';
                     break;
 
+                case SendingServer::TYPE_BULKSMSBD:
+                    $rules['api_link']  = 'required|url';
+                    $rules['api_token'] = 'required';
+                    $rules['c1']        = 'required';
+                    break;
+
                 case SendingServer::TYPE_SIGNALWIRE:
                     $rules['api_link']   = 'required|url';
                     $rules['api_token']  = 'required';

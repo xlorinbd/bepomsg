@@ -828,6 +828,27 @@
                     'quota_unit'      => 'minute',
                 ],
 
+                SendingServer::TYPE_BULKSMSBD => [
+                    'name'            => SendingServer::TYPE_BULKSMSBD,
+                    'settings'        => SendingServer::TYPE_BULKSMSBD,
+                    'api_link'        => 'http://bulksmsbd.net/api/smsapi',
+                    'api_token'       => 'api_token',
+                    'c1'              => null,
+                    'schedule'        => true,
+                    'type'            => 'http',
+                    'two_way'         => false,
+                    'plain'           => true,
+                    'mms'             => false,
+                    'voice'           => false,
+                    'whatsapp'        => false,
+                    'viber'           => false,
+                    'otp'             => false,
+                    'sms_per_request' => 1,
+                    'quota_value'     => 500,
+                    'quota_base'      => 1,
+                    'quota_unit'      => 'minute',
+                ],
+
                 SendingServer::TYPE_HABLAMEV2 => [
                     'name'            => SendingServer::TYPE_HABLAMEV2,
                     'settings'        => SendingServer::TYPE_HABLAMEV2,
@@ -3995,9 +4016,9 @@
                 ],
 
                 SendingServer::TYPE_ULTIMATESMS => [
-                    'name'            => SendingServer::TYPE_ULTIMATESMS,
+                    'name'            => 'Custom HTTP Gateway',
                     'settings'        => SendingServer::TYPE_ULTIMATESMS,
-                    'api_link'        => 'https://ultimatesms.codeglen.com/demo/api/http/sms/send',
+                    'api_link'        => 'https://your-sms-gateway.example.com/api/http/sms/send',
                     'api_token'       => 'API TOKEN',
                     'schedule'        => true,
                     'type'            => 'http',

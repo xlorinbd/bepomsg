@@ -37,7 +37,7 @@
             <!-- Left Text-->
             <div class="d-none d-lg-flex col-lg-8 align-items-center p-5 brand-panel">
                 <div class="brand-panel-inner">
-                    <span class="brand-mark">{{ strtoupper(substr(config('app.name', 'B'), 0, 1)) }}</span>
+                    <span class="brand-mark"><img src="{{ asset(Helper::app_config('app_logo')) }}" alt="{{ config('app.name') }}"></span>
                     <h3>{{ config('app.name') }}</h3>
                     <p>Reach every customer with reliable bulk SMS &amp; WhatsApp marketing — send campaigns, manage contacts, and track results in real time.</p>
                     <ul class="brand-highlights">
@@ -196,15 +196,15 @@
 @push('scripts')
     <script>
         $('.admin-login').on('click', function () {
-            $('#email').val('admin@codeglen.com')
+            $('#email').val('admin@bepomsg.com')
         });
 
         $('.customer-login').on('click', function () {
-            $('#email').val('customer@codeglen.com')
+            $('#email').val('customer@bepomsg.com')
         });
 
         $('.dlt-login').on('click', function () {
-            $('#email').val('dlt@codeglen.com')
+            $('#email').val('dlt@bepomsg.com')
         });
     </script>
 @endpush

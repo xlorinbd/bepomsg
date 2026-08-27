@@ -115,6 +115,12 @@ Route::any('callback/aamarpay/keywords', 'PaymentController@aamarpayKeywords')->
 Route::any('callback/aamarpay/subscriptions', 'PaymentController@aamarpaySubscriptions')->name('callback.aamarpay.subscriptions');
 Route::any('callback/aamarpay/top-up', 'PaymentController@aamarpayTopUp')->name('callback.aamarpay.top_up');
 
+Route::any('callback/paystation/senderid', 'PaymentController@paystationSenderID')->name('callback.paystation.senderid');
+Route::any('callback/paystation/numbers', 'PaymentController@paystationNumbers')->name('callback.paystation.numbers');
+Route::any('callback/paystation/keywords', 'PaymentController@paystationKeywords')->name('callback.paystation.keywords');
+Route::any('callback/paystation/subscriptions', 'PaymentController@paystationSubscriptions')->name('callback.paystation.subscriptions');
+Route::any('callback/paystation/top-up', 'PaymentController@paystationTopUp')->name('callback.paystation.top_up');
+
 Route::any('callback/flutterwave/senderid', 'PaymentController@flutterwaveSenderID')->name('callback.flutterwave.senderid');
 Route::any('callback/flutterwave/numbers', 'PaymentController@flutterwaveNumbers')->name('callback.flutterwave.numbers');
 Route::any('callback/flutterwave/keywords', 'PaymentController@flutterwaveKeywords')->name('callback.flutterwave.keywords');

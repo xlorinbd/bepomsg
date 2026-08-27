@@ -118,6 +118,12 @@
                     $rules['environment']   = 'required';
                     break;
 
+                case PaymentMethods::TYPE_PAYSTATION:
+                    $rules['merchantId']  = 'required';
+                    $rules['password']    = 'required';
+                    $rules['environment'] = 'required';
+                    break;
+
                 case PaymentMethods::TYPE_DIRECTPAYONLINE:
                     $rules['company_token'] = 'required';
                     $rules['account_type']  = 'required';
