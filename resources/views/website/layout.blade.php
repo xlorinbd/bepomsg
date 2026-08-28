@@ -4,434 +4,340 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', config('app.title', config('app.name')))</title>
-    <meta name="description" content="@yield('meta_description', 'BepoMSG is a powerful bulk SMS and WhatsApp marketing platform for businesses of every size.')">
+    <meta name="description" content="@yield('meta_description', 'BepoMSG is the next-gen bulk SMS platform for marketing campaigns, OTP verification, and transactional messaging with guaranteed high-speed delivery.')">
     <link rel="icon" href="{{ asset('favicon.ico') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --w-ink: #0f1729;
-            --w-ink-soft: #4b5573;
-            --w-bg: #ffffff;
-            --w-bg-soft: #f6f7fb;
-            --w-border: #e6e8f0;
-            --w-primary: #4f46e5;
-            --w-primary-dark: #4338ca;
-            --w-primary-soft: #eef0fe;
-            --w-accent: #06b6d4;
-            --w-success: #16a34a;
-            --w-radius: 16px;
-            --w-shadow: 0 8px 30px rgba(15, 23, 41, 0.06);
-            --w-shadow-lg: 0 20px 50px rgba(15, 23, 41, 0.12);
+            --brand-primary: #ff5500;
+            --brand-primary-hover: #e04a00;
+            --brand-glow: rgba(255, 85, 0, 0.35);
+            --brand-orange-light: #fff7ed;
+            --brand-orange-border: #ffedd5;
+            
+            --dark-base: #080b11;
+            --dark-surface: #0e131f;
+            --dark-card: #141b2b;
+            --dark-card-hover: #192236;
+            --dark-border: rgba(255, 255, 255, 0.08);
+            --dark-border-glow: rgba(255, 85, 0, 0.25);
+            
+            --light-bg: #f8fafc;
+            --light-surface: #ffffff;
+            --light-border: #e2e8f0;
+            --light-border-soft: #f1f5f9;
+            
+            --text-white: #ffffff;
+            --text-muted-dark: #94a3b8;
+            --text-subtle-dark: #64748b;
+            
+            --text-ink: #0f172a;
+            --text-ink-soft: #475569;
+            --text-ink-subtle: #64748b;
+            
+            --success: #10b981;
+            --radius-sm: 8px;
+            --radius-md: 14px;
+            --radius-lg: 20px;
+            --radius-full: 9999px;
+            
+            --shadow-soft: 0 4px 20px rgba(0, 0, 0, 0.04);
+            --shadow-card: 0 10px 30px rgba(15, 23, 42, 0.06);
+            --shadow-card-hover: 0 20px 40px rgba(15, 23, 42, 0.12);
+            --shadow-glow: 0 0 40px rgba(255, 85, 0, 0.22);
         }
 
-        * { box-sizing: border-box; }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
-        html { scroll-behavior: smooth; }
+        html {
+            scroll-behavior: smooth;
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
 
         body {
-            margin: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            color: var(--w-ink);
-            background: var(--w-bg);
+            background: var(--light-bg);
+            color: var(--text-ink);
             line-height: 1.6;
             -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
         }
 
-        img { max-width: 100%; display: block; }
-        a { color: inherit; text-decoration: none; }
+        a {
+            color: inherit;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+        img {
+            max-width: 100%;
+            display: block;
+        }
 
         .w-container {
             width: 100%;
-            max-width: 1160px;
+            max-width: 1200px;
             margin: 0 auto;
             padding: 0 24px;
         }
 
-        /* Header */
+        /* ===== NAVBAR ===== */
         .w-header {
             position: sticky;
             top: 0;
-            z-index: 50;
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: saturate(180%) blur(10px);
-            border-bottom: 1px solid var(--w-border);
+            z-index: 1000;
+            background: rgba(8, 11, 17, 0.88);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--dark-border);
         }
 
         .w-header-inner {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 16px 0;
+            height: 76px;
         }
 
         .w-logo {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
             font-weight: 800;
             font-size: 20px;
             letter-spacing: -0.02em;
-            color: var(--w-ink);
+            color: var(--text-white);
         }
 
-        .w-logo-mark {
-            width: 34px;
-            height: 34px;
+        .w-logo-badge {
+            width: 36px;
+            height: 36px;
             border-radius: 10px;
-            background: linear-gradient(135deg, var(--w-primary), var(--w-accent));
+            background: linear-gradient(135deg, #ff6b00 0%, #ff3b00 100%);
+            box-shadow: 0 4px 14px rgba(255, 85, 0, 0.4);
             display: flex;
             align-items: center;
             justify-content: center;
             color: #fff;
-            font-weight: 800;
-            font-size: 16px;
         }
 
-        .w-nav { display: flex; align-items: center; gap: 32px; }
+        .w-logo-badge svg {
+            width: 20px;
+            height: 20px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2.2;
+        }
 
-        .w-nav-links { display: flex; align-items: center; gap: 28px; }
+        .w-nav-links {
+            display: flex;
+            align-items: center;
+            gap: 32px;
+        }
 
         .w-nav-links a {
-            font-size: 15px;
+            font-size: 14.5px;
             font-weight: 600;
-            color: var(--w-ink-soft);
+            color: var(--text-muted-dark);
             transition: color 0.15s ease;
         }
 
-        .w-nav-links a:hover { color: var(--w-primary); }
+        .w-nav-links a:hover {
+            color: var(--text-white);
+        }
 
-        .w-nav-cta { display: flex; align-items: center; gap: 10px; }
+        .w-nav-cta {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
 
         .w-btn {
             display: inline-flex;
             align-items: center;
             justify-content: center;
             gap: 8px;
-            padding: 11px 22px;
-            border-radius: 999px;
             font-weight: 700;
-            font-size: 14.5px;
-            border: 1px solid transparent;
+            font-size: 14px;
+            border-radius: var(--radius-full);
+            padding: 10px 22px;
             cursor: pointer;
-            transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+            border: 1px solid transparent;
+            transition: all 0.2s ease;
             white-space: nowrap;
         }
 
+        .w-btn-signin {
+            color: var(--text-muted-dark);
+            font-weight: 600;
+            padding: 8px 12px;
+        }
+
+        .w-btn-signin:hover {
+            color: var(--text-white);
+        }
+
         .w-btn-primary {
-            background: var(--w-primary);
+            background: linear-gradient(135deg, #ff6000 0%, #ff4500 100%);
             color: #fff;
-            box-shadow: 0 6px 18px rgba(79, 70, 229, 0.28);
+            box-shadow: 0 4px 18px rgba(255, 85, 0, 0.35);
         }
 
-        .w-btn-primary:hover { background: var(--w-primary-dark); transform: translateY(-1px); }
-
-        .w-btn-ghost { background: transparent; color: var(--w-ink); border-color: var(--w-border); }
-
-        .w-btn-ghost:hover { border-color: var(--w-primary); color: var(--w-primary); }
-
-        .w-btn-light { background: #fff; color: var(--w-primary); }
-
-        .w-btn-light:hover { transform: translateY(-1px); box-shadow: 0 10px 24px rgba(0,0,0,0.18); }
-
-        .w-btn-lg { padding: 15px 30px; font-size: 16px; }
-
-        .w-menu-toggle { display: none; }
-
-        /* Hero */
-        .w-hero {
-            position: relative;
-            background: linear-gradient(180deg, #0f1729 0%, #171f38 100%);
-            color: #fff;
-            overflow: hidden;
-            padding: 96px 0 120px;
+        .w-btn-primary:hover {
+            background: linear-gradient(135deg, #ff6f14 0%, #eb3e00 100%);
+            box-shadow: 0 6px 24px rgba(255, 85, 0, 0.45);
+            transform: translateY(-1px);
         }
 
-        .w-hero::before {
-            content: "";
-            position: absolute;
-            inset: 0;
-            background:
-                radial-gradient(600px 300px at 15% 20%, rgba(79, 70, 229, 0.35), transparent 60%),
-                radial-gradient(500px 260px at 85% 10%, rgba(6, 182, 212, 0.28), transparent 60%);
-            pointer-events: none;
+        .w-btn-dark {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: var(--text-white);
         }
 
-        .w-hero-inner { position: relative; text-align: center; }
+        .w-btn-dark:hover {
+            background: rgba(255, 255, 255, 0.14);
+            border-color: rgba(255, 255, 255, 0.28);
+            transform: translateY(-1px);
+        }
 
-        .w-eyebrow {
-            display: inline-flex;
+        .w-btn-lg {
+            padding: 13px 28px;
+            font-size: 15.5px;
+        }
+
+        .w-mobile-toggle {
+            display: none;
+            background: transparent;
+            border: 1px solid var(--dark-border);
+            color: var(--text-white);
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            cursor: pointer;
             align-items: center;
-            gap: 8px;
-            padding: 7px 16px;
-            border-radius: 999px;
-            background: rgba(255,255,255,0.08);
-            border: 1px solid rgba(255,255,255,0.14);
-            font-size: 13.5px;
+            justify-content: center;
+        }
+
+        /* Mobile drawer */
+        .w-mobile-drawer {
+            display: none;
+            position: fixed;
+            top: 76px;
+            left: 0;
+            right: 0;
+            background: #0d121c;
+            border-bottom: 1px solid var(--dark-border);
+            padding: 24px;
+            flex-direction: column;
+            gap: 16px;
+            z-index: 999;
+        }
+
+        .w-mobile-drawer.active {
+            display: flex;
+        }
+
+        .w-mobile-drawer a {
+            color: #cbd5e1;
+            font-size: 16px;
+            font-weight: 600;
+            padding: 8px 0;
+        }
+
+        /* ===== FOOTER ===== */
+        .w-footer {
+            background: #06090e;
+            border-top: 1px solid rgba(255, 255, 255, 0.07);
+            color: var(--text-muted-dark);
+            padding: 72px 0 36px;
+        }
+
+        .w-footer-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 48px;
+            padding-bottom: 48px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+            margin-bottom: 32px;
+        }
+
+        .w-footer-brand p {
+            font-size: 14.5px;
+            color: #94a3b8;
+            margin-top: 16px;
+            max-width: 320px;
+            line-height: 1.6;
+        }
+
+        .w-footer-col h4 {
+            color: #ffffff;
+            font-size: 14px;
             font-weight: 700;
-            color: #c7d2fe;
-            margin-bottom: 24px;
-        }
-
-        .w-eyebrow .dot {
-            width: 7px; height: 7px; border-radius: 50%;
-            background: #34d399;
-            box-shadow: 0 0 0 4px rgba(52, 211, 153, 0.2);
-        }
-
-        .w-hero h1 {
-            font-size: clamp(34px, 5vw, 56px);
-            line-height: 1.12;
-            font-weight: 800;
-            letter-spacing: -0.03em;
-            margin: 0 0 20px;
-        }
-
-        .w-hero h1 span {
-            background: linear-gradient(90deg, #a5b4fc, #67e8f9);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-        }
-
-        .w-hero p {
-            max-width: 640px;
-            margin: 0 auto 36px;
-            font-size: 18px;
-            color: #cbd3e6;
-        }
-
-        .w-hero-actions {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 14px;
-            flex-wrap: wrap;
-        }
-
-        .w-hero-stats {
-            position: relative;
-            display: flex;
-            justify-content: center;
-            gap: 56px;
-            margin-top: 72px;
-            flex-wrap: wrap;
-        }
-
-        .w-hero-stat { text-align: center; }
-        .w-hero-stat b { display: block; font-size: 30px; font-weight: 800; }
-        .w-hero-stat span { font-size: 13.5px; color: #9aa4c2; font-weight: 600; }
-
-        /* Sections */
-        .w-section { padding: 96px 0; }
-        .w-section-soft { background: var(--w-bg-soft); }
-
-        .w-section-head { text-align: center; max-width: 620px; margin: 0 auto 56px; }
-
-        .w-kicker {
-            display: inline-block;
-            font-size: 13px;
-            font-weight: 800;
-            letter-spacing: 0.08em;
+            letter-spacing: 0.05em;
             text-transform: uppercase;
-            color: var(--w-primary);
-            margin-bottom: 14px;
-        }
-
-        .w-section-head h2 {
-            font-size: clamp(26px, 3.4vw, 38px);
-            font-weight: 800;
-            letter-spacing: -0.02em;
-            margin: 0 0 14px;
-        }
-
-        .w-section-head p { color: var(--w-ink-soft); font-size: 16.5px; margin: 0; }
-
-        /* Feature grid */
-        .w-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 24px;
-        }
-
-        .w-card {
-            background: #fff;
-            border: 1px solid var(--w-border);
-            border-radius: var(--w-radius);
-            padding: 28px;
-            box-shadow: var(--w-shadow);
-            transition: transform 0.15s ease, box-shadow 0.15s ease;
-        }
-
-        .w-card:hover { transform: translateY(-4px); box-shadow: var(--w-shadow-lg); }
-
-        .w-feature-icon {
-            width: 46px;
-            height: 46px;
-            border-radius: 12px;
-            background: var(--w-primary-soft);
-            color: var(--w-primary);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 21px;
             margin-bottom: 18px;
         }
 
-        .w-card h3 { font-size: 17.5px; font-weight: 800; margin: 0 0 8px; letter-spacing: -0.01em; }
-        .w-card p { font-size: 15px; color: var(--w-ink-soft); margin: 0; }
-
-        /* Steps */
-        .w-steps {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 32px;
-            counter-reset: step;
-        }
-
-        .w-step { position: relative; padding-left: 4px; }
-
-        .w-step-num {
-            width: 40px; height: 40px;
-            border-radius: 50%;
-            background: var(--w-ink);
-            color: #fff;
-            display: flex; align-items: center; justify-content: center;
-            font-weight: 800; font-size: 15px;
-            margin-bottom: 18px;
-        }
-
-        .w-step h3 { font-size: 17px; font-weight: 800; margin: 0 0 8px; }
-        .w-step p { font-size: 15px; color: var(--w-ink-soft); margin: 0; }
-
-        /* Pricing */
-        .w-pricing-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
-            gap: 24px;
-            align-items: stretch;
-        }
-
-        .w-price-card {
-            position: relative;
-            background: #fff;
-            border: 1px solid var(--w-border);
-            border-radius: 20px;
-            padding: 32px 28px;
-            box-shadow: var(--w-shadow);
+        .w-footer-col ul {
+            list-style: none;
             display: flex;
             flex-direction: column;
-            transition: transform 0.15s ease, box-shadow 0.15s ease;
-        }
-
-        .w-price-card:hover { transform: translateY(-4px); box-shadow: var(--w-shadow-lg); }
-
-        .w-price-card.is-popular {
-            border-color: var(--w-primary);
-            box-shadow: var(--w-shadow-lg);
-        }
-
-        .w-badge-popular {
-            position: absolute;
-            top: -13px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: linear-gradient(90deg, var(--w-primary), var(--w-accent));
-            color: #fff;
-            font-size: 12px;
-            font-weight: 800;
-            letter-spacing: 0.04em;
-            text-transform: uppercase;
-            padding: 6px 16px;
-            border-radius: 999px;
-        }
-
-        .w-price-name { font-size: 18px; font-weight: 800; margin: 4px 0 6px; }
-        .w-price-desc { font-size: 14px; color: var(--w-ink-soft); min-height: 20px; margin-bottom: 20px; }
-
-        .w-price-amount { display: flex; align-items: baseline; gap: 6px; margin-bottom: 4px; }
-        .w-price-amount .num { font-size: 40px; font-weight: 800; letter-spacing: -0.02em; }
-        .w-price-amount .cur { font-size: 16px; font-weight: 700; color: var(--w-ink-soft); }
-        .w-price-cycle { font-size: 13.5px; color: var(--w-ink-soft); margin-bottom: 24px; }
-
-        .w-price-features { list-style: none; margin: 0 0 28px; padding: 0; flex: 1; }
-        .w-price-features li {
-            display: flex;
-            align-items: flex-start;
             gap: 10px;
-            font-size: 14.5px;
-            color: var(--w-ink);
-            padding: 8px 0;
-            border-top: 1px solid var(--w-border);
-        }
-        .w-price-features li:first-child { border-top: none; }
-
-        .w-check {
-            flex: none;
-            width: 18px; height: 18px;
-            border-radius: 50%;
-            background: rgba(22, 163, 74, 0.12);
-            color: var(--w-success);
-            display: flex; align-items: center; justify-content: center;
-            font-size: 11px;
-            margin-top: 2px;
         }
 
-        .w-price-card .w-btn { width: 100%; }
-
-        .w-price-note { text-align: center; margin-top: 40px; color: var(--w-ink-soft); font-size: 14.5px; }
-
-        /* CTA band */
-        .w-cta {
-            border-radius: 28px;
-            background: linear-gradient(135deg, #4f46e5, #06b6d4);
-            color: #fff;
-            padding: 64px 48px;
-            text-align: center;
-            box-shadow: var(--w-shadow-lg);
+        .w-footer-col a {
+            color: #94a3b8;
+            font-size: 14px;
+            font-weight: 500;
         }
 
-        .w-cta h2 { font-size: clamp(24px, 3vw, 32px); font-weight: 800; margin: 0 0 12px; letter-spacing: -0.02em; }
-        .w-cta p { max-width: 520px; margin: 0 auto 28px; color: rgba(255,255,255,0.9); font-size: 16px; }
+        .w-footer-col a:hover {
+            color: #ff6b00;
+        }
 
-        /* Footer */
-        .w-footer { background: #0f1729; color: #9aa4c2; padding: 56px 0 28px; }
-
-        .w-footer-top {
+        .w-footer-bottom {
             display: flex;
+            align-items: center;
             justify-content: space-between;
-            align-items: flex-start;
+            font-size: 13.5px;
+            color: #64748b;
             flex-wrap: wrap;
-            gap: 32px;
-            padding-bottom: 36px;
-            border-bottom: 1px solid rgba(255,255,255,0.08);
-            margin-bottom: 24px;
+            gap: 16px;
         }
 
-        .w-footer-brand p { max-width: 320px; font-size: 14px; margin-top: 12px; }
-        .w-footer-links { display: flex; gap: 64px; flex-wrap: wrap; }
-        .w-footer-col h4 { color: #fff; font-size: 13.5px; margin: 0 0 14px; letter-spacing: 0.04em; text-transform: uppercase; }
-        .w-footer-col a { display: block; font-size: 14.5px; padding: 6px 0; color: #9aa4c2; }
-        .w-footer-col a:hover { color: #fff; }
-        .w-footer-bottom { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; font-size: 13.5px; }
-
-        @media (max-width: 900px) {
-            .w-grid, .w-steps { grid-template-columns: repeat(2, 1fr); }
+        .w-footer-bottom a {
+            color: #64748b;
         }
 
-        @media (max-width: 760px) {
-            .w-nav-links { display: none; }
-            .w-menu-toggle {
-                display: inline-flex;
-                align-items: center; justify-content: center;
-                width: 40px; height: 40px;
-                border-radius: 10px;
-                border: 1px solid var(--w-border);
-                background: #fff;
+        .w-footer-bottom a:hover {
+            color: #cbd5e1;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 992px) {
+            .w-footer-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 36px;
             }
-            .w-grid, .w-steps { grid-template-columns: 1fr; }
-            .w-hero { padding: 72px 0 88px; }
-            .w-hero-stats { gap: 32px; }
-            .w-cta { padding: 48px 24px; }
-            .w-footer-top { flex-direction: column; }
+        }
+
+        @media (max-width: 768px) {
+            .w-nav-links, .w-btn-signin {
+                display: none;
+            }
+            .w-mobile-toggle {
+                display: flex;
+            }
+            .w-footer-grid {
+                grid-template-columns: 1fr;
+                gap: 32px;
+            }
         }
     </style>
     @yield('page-style')
@@ -441,54 +347,121 @@
 <header class="w-header">
     <div class="w-container w-header-inner">
         <a href="{{ route('home') }}" class="w-logo">
-            <span class="w-logo-mark">B</span>
-            {{ config('app.name', 'BepoMSG') }}
+            <div class="w-logo-badge">
+                <svg viewBox="0 0 24 24">
+                    <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
+                </svg>
+            </div>
+            <span>{{ config('app.name', 'BepoMSG') }}</span>
         </a>
-        <nav class="w-nav">
-            <div class="w-nav-links">
-                <a href="{{ route('home') }}">Home</a>
-                <a href="{{ route('website.packages') }}">Packages</a>
-                <a href="{{ route('home') }}#features">Features</a>
-            </div>
-            <div class="w-nav-cta">
-                <a href="{{ route('login') }}" class="w-btn w-btn-ghost">Login</a>
-                <a href="{{ route('register') }}" class="w-btn w-btn-primary">Get Started</a>
-            </div>
+
+        <nav class="w-nav-links">
+            <a href="{{ route('home') }}#features">Features</a>
+            <a href="{{ route('home') }}#solutions">Solutions</a>
+            <a href="{{ route('home') }}#how-it-works">How It Works</a>
+            <a href="{{ route('home') }}#developers">Developers</a>
+            <a href="{{ route('website.packages') }}">Pricing</a>
+            <a href="{{ route('home') }}#faq">FAQ</a>
         </nav>
+
+        <div class="w-nav-cta">
+            <a href="{{ route('login') }}" class="w-btn-signin">Sign In</a>
+            <a href="{{ route('register') }}" class="w-btn w-btn-primary">Get started &rarr;</a>
+            <button class="w-mobile-toggle" id="mobileMenuBtn" aria-label="Toggle Navigation">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="3" y1="12" x2="21" y2="12"></line>
+                    <line x1="3" y1="6" x2="21" y2="6"></line>
+                    <line x1="3" y1="18" x2="21" y2="18"></line>
+                </svg>
+            </button>
+        </div>
     </div>
 </header>
+
+<div class="w-mobile-drawer" id="mobileDrawer">
+    <a href="{{ route('home') }}#features">Features</a>
+    <a href="{{ route('home') }}#solutions">Solutions</a>
+    <a href="{{ route('home') }}#how-it-works">How It Works</a>
+    <a href="{{ route('home') }}#developers">Developers</a>
+    <a href="{{ route('website.packages') }}">Pricing</a>
+    <a href="{{ route('home') }}#faq">FAQ</a>
+    <hr style="border: 0; border-top: 1px solid var(--dark-border); margin: 8px 0;">
+    <a href="{{ route('login') }}">Sign In</a>
+    <a href="{{ route('register') }}" class="w-btn w-btn-primary" style="text-align: center;">Get started &rarr;</a>
+</div>
 
 @yield('content')
 
 <footer class="w-footer">
     <div class="w-container">
-        <div class="w-footer-top">
+        <div class="w-footer-grid">
             <div class="w-footer-brand">
-                <a href="{{ route('home') }}" class="w-logo" style="color:#fff;">
-                    <span class="w-logo-mark">B</span>
-                    {{ config('app.name', 'BepoMSG') }}
+                <a href="{{ route('home') }}" class="w-logo">
+                    <div class="w-logo-badge">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
+                        </svg>
+                    </div>
+                    <span>{{ config('app.name', 'BepoMSG') }}</span>
                 </a>
-                <p>{{ config('app.title', 'Bulk SMS & WhatsApp marketing platform') }} — reach your customers instantly, at scale.</p>
+                <p>The next-generation bulk SMS and messaging platform for high-converting marketing campaigns, OTPs, and alerts at global scale.</p>
             </div>
-            <div class="w-footer-links">
-                <div class="w-footer-col">
-                    <h4>Product</h4>
-                    <a href="{{ route('home') }}">Home</a>
-                    <a href="{{ route('website.packages') }}">Packages</a>
-                </div>
-                <div class="w-footer-col">
-                    <h4>Account</h4>
-                    <a href="{{ route('login') }}">Login</a>
-                    <a href="{{ route('register') }}">Register</a>
-                </div>
+
+            <div class="w-footer-col">
+                <h4>Product</h4>
+                <ul>
+                    <li><a href="{{ route('home') }}#features">Bulk Campaigns</a></li>
+                    <li><a href="{{ route('home') }}#solutions">OTP & 2FA Delivery</a></li>
+                    <li><a href="{{ route('home') }}#developers">REST API & SDKs</a></li>
+                    <li><a href="{{ route('website.packages') }}">Pricing Plans</a></li>
+                </ul>
+            </div>
+
+            <div class="w-footer-col">
+                <h4>Solutions</h4>
+                <ul>
+                    <li><a href="{{ route('home') }}#solutions">Marketing Campaigns</a></li>
+                    <li><a href="{{ route('home') }}#solutions">Operations & Alerts</a></li>
+                    <li><a href="{{ route('home') }}#solutions">Authentication</a></li>
+                    <li><a href="{{ route('home') }}#faq">Help & FAQ</a></li>
+                </ul>
+            </div>
+
+            <div class="w-footer-col">
+                <h4>Account</h4>
+                <ul>
+                    <li><a href="{{ route('login') }}">Client Portal</a></li>
+                    <li><a href="{{ route('register') }}">Create Account</a></li>
+                    <li><a href="{{ route('home') }}#pricing">Coverage Rates</a></li>
+                </ul>
             </div>
         </div>
+
         <div class="w-footer-bottom">
-            <span>{!! config('app.footer_text', 'Copyright &copy; ' . config('app.name') . ' - ' . date('Y')) !!}</span>
-            <span>Powered by {{ config('app.name', 'BepoMSG') }}</span>
+            <div>{!! config('app.footer_text', 'Copyright &copy; ' . config('app.name', 'BepoMSG') . ' - ' . date('Y')) !!}</div>
+            <div style="display:flex; gap: 20px;">
+                <a href="#">Privacy Policy</a>
+                <a href="#">Terms of Service</a>
+                <a href="#">Security</a>
+            </div>
         </div>
     </div>
 </footer>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const mobileBtn = document.getElementById('mobileMenuBtn');
+        const drawer = document.getElementById('mobileDrawer');
+        if (mobileBtn && drawer) {
+            mobileBtn.addEventListener('click', function() {
+                drawer.classList.toggle('active');
+            });
+            drawer.querySelectorAll('a').forEach(link => {
+                link.addEventListener('click', () => drawer.classList.remove('active'));
+            });
+        }
+    });
+</script>
 
 </body>
 </html>
