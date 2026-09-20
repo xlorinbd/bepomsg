@@ -44,7 +44,7 @@
         [
             'namespace'  => 'User',
             'as'         => 'user.',
-            'middleware' => ['auth', 'verified'],
+            'middleware' => ['auth'],
         ],
         function () {
             /*

@@ -77,7 +77,8 @@ class KYCController extends AdminBaseController
 
         $user->update([
             'verification_status' => 'approved',
-            'status' => true // Ensure account is active
+            'status' => true, // Ensure account is active
+            'email_verified_at' => $user->email_verified_at ?: Carbon::now(),
         ]);
 
         // Assign Sending Server

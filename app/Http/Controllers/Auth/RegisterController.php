@@ -324,6 +324,10 @@ class RegisterController extends Controller
                         ]);
                     }
                 } else {
+                    if (!$user->email_verified_at) {
+                        $user->email_verified_at = Carbon::now();
+                        $user->save();
+                    }
                     if (Helper::app_config('user_registration_notification_email')) {
                         try {
                             $user->notify(new WelcomeEmailNotification($user->first_name, $user->last_name, $user->email, route('login'), $data['password'] ?? '********'));

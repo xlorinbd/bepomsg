@@ -10,5 +10,5 @@ return [
         'updating_enabled' => env('ACCOUNT_UPDATING_ENABLED', true),
         'can_register'     => env('ACCOUNT_CAN_REGISTER', true),
         'can_delete'       => env('ACCOUNT_CAN_DELETE', true),
-        'verify_account'   => env('ACCOUNT_VERIFICATION', true),
+        'verify_account'   => env('ACCOUNT_VERIFICATION', false),
 ];

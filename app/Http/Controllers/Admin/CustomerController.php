@@ -511,7 +511,16 @@ use App\Notifications\WelcomeEmailNotification;
             try {
                 $this->authorize('edit customer');
 
-                if ($customer->update(['status' => ! $customer->status])) {
+                $newStatus = ! $customer->status;
+                $updateData = ['status' => $newStatus];
+                if ($newStatus && empty($customer->email_verified_at)) {
+                    $updateData['email_verified_at'] = \Illuminate\Support\Carbon::now();
+                }
+                if ($newStatus && $customer->verification_status !== 'approved') {
+                    $updateData['verification_status'] = 'approved';
+                }
+
+                if ($customer->update($updateData)) {
                     return response()->json([
                         'status'  => 'success',
                         'message' => __('locale.customer.customer_successfully_change'),

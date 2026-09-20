@@ -141,6 +141,13 @@ class EloquentCustomerRepository extends EloquentBaseRepository implements Custo
 
         if (isset($input['verification_status'])) {
             $user->verification_status = $input['verification_status'];
+            if ($input['verification_status'] === 'approved' && empty($user->email_verified_at)) {
+                $user->email_verified_at = Carbon::now();
+            }
+        }
+
+        if (isset($input['status']) && $input['status'] && empty($user->email_verified_at)) {
+            $user->email_verified_at = Carbon::now();
         }
 
         if (!$user->save()) {

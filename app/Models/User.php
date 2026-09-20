@@ -32,7 +32,7 @@ use Laravel\Sanctum\HasApiTokens;
  * @property int|null    $two_factor_code
  * @property Carbon|null $two_factor_expires_at
  */
-class User extends Authenticatable implements MustVerifyEmail
+class User extends Authenticatable
 {
     use HasApiTokens, Notifiable;
 
@@ -467,5 +467,21 @@ class User extends Authenticatable implements MustVerifyEmail
     public function isRejected(): bool
     {
         return $this->verification_status === 'rejected';
+    }
+
+    /**
+     * Determine if the user has verified their email address.
+     */
+    public function hasVerifiedEmail(): bool
+    {
+        if (!config('account.verify_account')) {
+            return true;
+        }
+
+        if ($this->verification_status === 'approved') {
+            return true;
+        }
+
+        return !is_null($this->email_verified_at);
     }
 }
