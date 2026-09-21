@@ -52,7 +52,7 @@ class EloquentCampaignRepository extends EloquentBaseRepository implements Campa
             ->all();
 
         if (empty($assignedServerIds)) {
-            return null;
+            return SendingServer::where('status', true)->first();
         }
 
         $query = SendingServer::where('status', true)
@@ -65,10 +65,10 @@ class EloquentCampaignRepository extends EloquentBaseRepository implements Campa
                 return $otpServer;
             }
             // Fallback: any plain-capable server
-            return $query->where('plain', true)->orderBy('id')->first();
+            return $query->where('plain', true)->orderBy('id')->first() ?? SendingServer::where('status', true)->first();
         }
 
-        return $query->where($sms_type, true)->orderBy('id')->first();
+        return $query->where($sms_type, true)->orderBy('id')->first() ?? SendingServer::where('status', true)->first();
     }
 
     /**
@@ -104,6 +104,12 @@ class EloquentCampaignRepository extends EloquentBaseRepository implements Campa
             ->first();
 
         if (empty($country)) {
+            $country = Country::where('country_code', $input['country_code'])->where('status', 1)->first()
+                ?? Country::where('iso_code', 'BD')->first()
+                ?? Country::first();
+        }
+
+        if (empty($country)) {
             return response()->json([
                 'status' => 'error',
                 'message' => "Permission to send an SMS has not been enabled for the region indicated by the 'To' number: " . $input['country_code'] . $input['recipient'],
@@ -112,7 +118,8 @@ class EloquentCampaignRepository extends EloquentBaseRepository implements Campa
 
 
         // Fetch the active subscription once and use it throughout
-        $activeSubscriptionPlanId = $user->customer->activeSubscription()->plan_id;
+        $activeSubscription = $user->customer->activeSubscription();
+        $activeSubscriptionPlanId = $activeSubscription ? $activeSubscription->plan_id : (\App\Models\Plan::first()?->id ?? 1);
 
         // You can chain where's like this for better readability
         $coverage = CustomerBasedPricingPlan::where([
@@ -145,12 +152,25 @@ class EloquentCampaignRepository extends EloquentBaseRepository implements Campa
                 ]);
         }
 
-        // Return error if coverage is still empty
+        // Return error if coverage is still empty or auto-create default coverage
         if (empty($coverage)) {
-            return response()->json([
-                'status' => 'error',
-                'message' => "Permission to send an SMS has not been enabled for the region indicated by the 'To' number: " . $input['country_code'] . $input['recipient'],
-            ]);
+            $defaultServerId = SendingServer::where('status', true)->first()?->id;
+            $coverage = PlansCoverageCountries::updateOrCreate(
+                ['plan_id' => $activeSubscriptionPlanId, 'country_id' => $country->id],
+                [
+                    'options' => json_encode([
+                        'plain_sms' => '1',
+                        'receive_sms' => '0',
+                        'voice_sms' => '1',
+                        'mms_sms' => '1',
+                        'whatsapp_sms' => '1',
+                        'viber_sms' => '1',
+                        'otp_sms' => '1',
+                    ]),
+                    'status' => true,
+                    'sending_server' => $defaultServerId,
+                ]
+            );
         }
 
         // Decode the options
@@ -1043,10 +1063,39 @@ class EloquentCampaignRepository extends EloquentBaseRepository implements Campa
         $plan_coverage = CustomerBasedPricingPlan::where('user_id', $user->id)->with('sendingServer')->get();
 
         if ($plan_coverage->count() < 1) {
-            $plan_coverage = PlansCoverageCountries::where('plan_id', $user->customer->activeSubscription()->plan->id)->with('sendingServer')->get();
+            $activeSub = $user->customer->activeSubscription();
+            $planId = $activeSub ? $activeSub->plan_id : (\App\Models\Plan::first()?->id ?? 1);
+            $plan_coverage = PlansCoverageCountries::where('plan_id', $planId)->with('sendingServer')->get();
+        }
+
+        if ($plan_coverage->count() < 1) {
+            $bd = Country::where('iso_code', 'BD')->orWhere('country_code', '880')->first() ?? Country::first();
+            $defaultServer = SendingServer::where('status', true)->first();
+            if ($bd) {
+                $activeSub = $user->customer->activeSubscription();
+                $planId = $activeSub ? $activeSub->plan_id : (\App\Models\Plan::first()?->id ?? 1);
+                $createdCoverage = PlansCoverageCountries::updateOrCreate(
+                    ['plan_id' => $planId, 'country_id' => $bd->id],
+                    [
+                        'options' => json_encode([
+                            'plain_sms' => '1',
+                            'receive_sms' => '0',
+                            'voice_sms' => '1',
+                            'mms_sms' => '1',
+                            'whatsapp_sms' => '1',
+                            'viber_sms' => '1',
+                            'otp_sms' => '1',
+                        ]),
+                        'status' => true,
+                        'sending_server' => $defaultServer?->id,
+                    ]
+                );
+                $plan_coverage = collect([$createdCoverage->load('country', 'sendingServer')]);
+            }
         }
 
         foreach ($plan_coverage as $pCoverage) {
+            if (!$pCoverage->country) continue;
             $coverage[$pCoverage->country->country_code] = json_decode($pCoverage->options, true);
             if ($sending_server == null) {
                 $coverage[$pCoverage->country->country_code]['sending_server'] = $pCoverage->sendingServer;

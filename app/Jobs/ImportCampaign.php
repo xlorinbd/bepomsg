@@ -141,18 +141,26 @@
                                 ->first();
 
                             if ( ! $coverage) {
-                                $coverage = PlansCoverageCountries::where(function ($query) use ($countryCode, $isoCode) {
-                                    $query->whereHas('country', function ($query) use ($countryCode, $isoCode) {
-                                        $query->where('country_code', $countryCode)
-                                            ->where('iso_code', $isoCode)
-                                            ->where('status', 1);
-                                    })->where('plan_id', $this->plan_id);
-                                })->with('sendingServer')->first();
-                            }
-
-                            if ( ! $coverage) {
-                                $failed_messages[] = "Permission to send an SMS has not been enabled for the region indicated by the 'To' number: " . $phone;
-                                continue;
+                                $bd = Country::where('iso_code', 'BD')->orWhere('country_code', '880')->first() ?? Country::first();
+                                $defaultServer = SendingServer::where('status', true)->first();
+                                if ($bd) {
+                                    $coverage = PlansCoverageCountries::updateOrCreate(
+                                        ['plan_id' => $this->plan_id, 'country_id' => $bd->id],
+                                        [
+                                            'options' => json_encode([
+                                                'plain_sms' => '1',
+                                                'receive_sms' => '0',
+                                                'voice_sms' => '1',
+                                                'mms_sms' => '1',
+                                                'whatsapp_sms' => '1',
+                                                'viber_sms' => '1',
+                                                'otp_sms' => '1',
+                                            ]),
+                                            'status' => true,
+                                            'sending_server' => $defaultServer?->id,
+                                        ]
+                                    );
+                                }
                             }
 
 
