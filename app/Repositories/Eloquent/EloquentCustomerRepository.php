@@ -88,7 +88,7 @@ class EloquentCustomerRepository extends EloquentBaseRepository implements Custo
         ]);
 
         // Assign default plan
-        $plan = \App\Models\Plan::where('is_default', 1)->where('status', 1)->first();
+        $plan = \App\Models\Plan::where('is_default', 1)->first() ?? \App\Models\Plan::where('status', 1)->first() ?? \App\Models\Plan::first();
         if ($plan) {
             $subscription = new \App\Models\Subscription();
             $subscription->user_id = $user->id;
@@ -96,8 +96,13 @@ class EloquentCustomerRepository extends EloquentBaseRepository implements Custo
             $subscription->status = \App\Models\Subscription::STATUS_ACTIVE;
             $subscription->plan_id = $plan->id;
             $subscription->end_period_last_days = '10';
-            $subscription->current_period_ends_at = $subscription->getPeriodEndsAt(now()) ?? now()->addMonth();
+            $subscription->current_period_ends_at = $subscription->getPeriodEndsAt(now()) ?? now()->addYears(10);
             $subscription->save();
+
+            if (empty($user->sms_unit) || $user->sms_unit === '0' || $user->sms_unit === 0) {
+                $user->sms_unit = $plan->getOption('sms_max') ?: '100';
+                $user->save();
+            }
         }
 
         if (isset($input['welcome_message'])) {

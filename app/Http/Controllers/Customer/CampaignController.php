@@ -168,7 +168,7 @@
 
             $activeSubscription = Auth::user()->customer->activeSubscription();
             if ($activeSubscription) {
-                $plan = Plan::where('status', true)->find($activeSubscription->plan_id);
+                $plan = $activeSubscription->plan ?? Plan::find($activeSubscription->plan_id) ?? Plan::first();
                 if ( ! $plan) {
                     return redirect()->route('customer.sms.quick_send')->with([
                         'status'  => 'error',
@@ -435,7 +435,7 @@
                 ]);
             }
 
-            $plan = Plan::where('status', true)->find($activeSubscription->plan_id);
+            $plan = $activeSubscription->plan ?? Plan::find($activeSubscription->plan_id) ?? Plan::first();
 
             if ( ! $plan) {
                 return redirect()->route('customer.sms.campaign_builder')->with([
@@ -619,7 +619,7 @@
                 ]);
             }
 
-            $plan = Plan::where('status', true)->find($activeSubscription->plan_id);
+            $plan = $activeSubscription->plan ?? Plan::find($activeSubscription->plan_id) ?? Plan::first();
 
             if ( ! $plan) {
                 return redirect()->route('customer.sms.import')->with([
@@ -743,7 +743,7 @@
 
             $activeSubscription = Auth::user()->customer->activeSubscription();
             if ($activeSubscription) {
-                $plan = Plan::where('status', true)->find($activeSubscription->plan_id);
+                $plan = $activeSubscription->plan ?? Plan::find($activeSubscription->plan_id) ?? Plan::first();
                 if ( ! $plan) {
                     return redirect()->route('customer.voice.quick_send')->with([
                         'status'  => 'error',
@@ -920,7 +920,7 @@
                 ]);
             }
 
-            $plan = Plan::where('status', true)->find($activeSubscription->plan_id);
+            $plan = $activeSubscription->plan ?? Plan::find($activeSubscription->plan_id) ?? Plan::first();
 
             if ( ! $plan) {
                 return redirect()->route('customer.voice.campaign_builder')->with([
@@ -1136,7 +1136,7 @@
 
             $activeSubscription = Auth::user()->customer->activeSubscription();
             if ($activeSubscription) {
-                $plan = Plan::where('status', true)->find($activeSubscription->plan_id);
+                $plan = $activeSubscription->plan ?? Plan::find($activeSubscription->plan_id) ?? Plan::first();
                 if ( ! $plan) {
                     return redirect()->route('customer.mms.quick_send')->with([
                         'status'  => 'error',
@@ -1276,7 +1276,7 @@
                 ]);
             }
 
-            $plan = Plan::where('status', true)->find($activeSubscription->plan_id);
+            $plan = $activeSubscription->plan ?? Plan::find($activeSubscription->plan_id) ?? Plan::first();
 
             if ( ! $plan) {
                 return redirect()->route('customer.mms.campaign_builder')->with([
@@ -1490,7 +1490,7 @@
 
             $activeSubscription = Auth::user()->customer->activeSubscription();
             if ($activeSubscription) {
-                $plan = Plan::where('status', true)->find($activeSubscription->plan_id);
+                $plan = $activeSubscription->plan ?? Plan::find($activeSubscription->plan_id) ?? Plan::first();
                 if ( ! $plan) {
                     return redirect()->route('customer.whatsapp.quick_send')->with([
                         'status'  => 'error',
@@ -1641,7 +1641,7 @@
                 ]);
             }
 
-            $plan = Plan::where('status', true)->find($activeSubscription->plan_id);
+            $plan = $activeSubscription->plan ?? Plan::find($activeSubscription->plan_id) ?? Plan::first();
 
             if ( ! $plan) {
                 return redirect()->route('customer.whatsapp.campaign_builder')->with([
@@ -2024,7 +2024,7 @@
 
             $activeSubscription = Auth::user()->customer->activeSubscription();
             if ($activeSubscription) {
-                $plan = Plan::where('status', true)->find($activeSubscription->plan_id);
+                $plan = $activeSubscription->plan ?? Plan::find($activeSubscription->plan_id) ?? Plan::first();
                 if ( ! $plan) {
                     return redirect()->route('customer.viber.quick_send')->with([
                         'status'  => 'error',
@@ -2170,7 +2170,7 @@
                 ]);
             }
 
-            $plan = Plan::where('status', true)->find($activeSubscription->plan_id);
+            $plan = $activeSubscription->plan ?? Plan::find($activeSubscription->plan_id) ?? Plan::first();
 
             if ( ! $plan) {
                 return redirect()->route('customer.viber.campaign_builder')->with([
@@ -2391,7 +2391,7 @@
 
             $activeSubscription = Auth::user()->customer->activeSubscription();
             if ($activeSubscription) {
-                $plan = Plan::where('status', true)->find($activeSubscription->plan_id);
+                $plan = $activeSubscription->plan ?? Plan::find($activeSubscription->plan_id) ?? Plan::first();
                 if ( ! $plan) {
                     return redirect()->route('customer.otp.quick_send')->with([
                         'status'  => 'error',
@@ -2556,7 +2556,7 @@
                 ]);
             }
 
-            $plan = Plan::where('status', true)->find($activeSubscription->plan_id);
+            $plan = $activeSubscription->plan ?? Plan::find($activeSubscription->plan_id) ?? Plan::first();
 
             if ( ! $plan) {
                 return redirect()->route('customer.otp.campaign_builder')->with([

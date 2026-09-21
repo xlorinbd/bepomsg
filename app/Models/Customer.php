@@ -131,7 +131,33 @@ class Customer extends Model
      */
     public function activeSubscription()
     {
-        return (is_object($this->subscription) && $this->subscription->active()) ? $this->subscription : null;
+        if (is_object($this->subscription) && $this->subscription->active()) {
+            return $this->subscription;
+        }
+
+        // If no active subscription exists, attempt to find any existing subscription and activate it,
+        // or auto-create a default active subscription for this customer
+        $plan = Plan::where('is_default', 1)->first() ?? Plan::first();
+        if ($plan && $this->user_id) {
+            $subscription = Subscription::where('user_id', $this->user_id)->orderBy('created_at', 'desc')->first();
+            if (!$subscription) {
+                $subscription = new Subscription();
+                $subscription->user_id = $this->user_id;
+            }
+            $subscription->start_at = now();
+            $subscription->status = Subscription::STATUS_ACTIVE;
+            $subscription->plan_id = $subscription->plan_id ?: $plan->id;
+            $subscription->end_at = null;
+            $subscription->end_period_last_days = '10';
+            $subscription->current_period_ends_at = now()->addYears(10);
+            $subscription->save();
+
+            $this->load('subscription');
+
+            return $subscription;
+        }
+
+        return $this->subscription;
     }
 
     /**
@@ -141,9 +167,11 @@ class Customer extends Model
      */
     public function getOptions(): array
     {
-        if (is_object($this->activeSubscription())) {
+        $activeSub = $this->activeSubscription();
+        if (is_object($activeSub)) {
             // Find plan
-            return $this->activeSubscription()->plan->getOptions();
+            $plan = $activeSub->plan ?? Plan::find($activeSub->plan_id) ?? Plan::first();
+            return $plan ? $plan->getOptions() : [];
         } else {
             return [];
         }

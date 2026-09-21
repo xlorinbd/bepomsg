@@ -81,6 +81,42 @@ class KYCController extends AdminBaseController
             'email_verified_at' => $user->email_verified_at ?: Carbon::now(),
         ]);
 
+        // Ensure customer record and active subscription exist
+        if ($user->is_customer) {
+            $customer = $user->customer;
+            if (!$customer) {
+                $customer = \App\Models\Customer::create([
+                    'user_id' => $user->id,
+                    'phone' => $user->phone ?? '',
+                    'permissions' => \App\Models\Customer::customerPermissions(),
+                ]);
+            }
+            $activeSub = $customer->activeSubscription();
+            if (!$activeSub) {
+                $plan = \App\Models\Plan::where('is_default', 1)->first() ?? \App\Models\Plan::first();
+                if ($plan) {
+                    $subscription = \App\Models\Subscription::where('user_id', $user->id)->orderBy('created_at', 'desc')->first();
+                    if (!$subscription) {
+                        $subscription = new \App\Models\Subscription();
+                        $subscription->user_id = $user->id;
+                    }
+                    $subscription->start_at = Carbon::now();
+                    $subscription->status = \App\Models\Subscription::STATUS_ACTIVE;
+                    $subscription->plan_id = $subscription->plan_id ?: $plan->id;
+                    $subscription->end_at = null;
+                    $subscription->end_period_last_days = '10';
+                    $subscription->current_period_ends_at = Carbon::now()->addYears(10);
+                    $subscription->save();
+                }
+            }
+
+            if (empty($user->sms_unit) || $user->sms_unit === '0' || $user->sms_unit === 0) {
+                $plan = \App\Models\Plan::where('is_default', 1)->first() ?? \App\Models\Plan::first();
+                $user->sms_unit = $plan ? ($plan->getOption('sms_max') ?: '100') : '100';
+                $user->save();
+            }
+        }
+
         // Assign Sending Server
         if ($request->filled('sending_server')) {
             CustomerBasedSendingServer::updateOrCreate(

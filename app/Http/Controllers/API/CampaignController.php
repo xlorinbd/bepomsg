@@ -56,14 +56,8 @@
             }
 
             $activeSubscription = $user->customer->activeSubscription();
-            if ($activeSubscription) {
-                $plan = Plan::where('status', true)->find($activeSubscription->plan_id);
-                if ( ! $plan) {
-                    return $this->error('Purchased plan is not active. Please contact support team.');
-                }
-            }
-
-            if ( ! isset($activeSubscription->plan)) {
+            $plan = $activeSubscription?->plan ?? ($activeSubscription ? Plan::find($activeSubscription->plan_id) : null) ?? Plan::first();
+            if ( ! $plan) {
                 return $this->error('Purchased plan is not active. Please contact support team.');
             }
 

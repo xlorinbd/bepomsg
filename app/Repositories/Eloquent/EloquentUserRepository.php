@@ -116,6 +116,25 @@
                 if ($customer) {
                     $permissions     = json_decode($user->customer->permissions, true);
                     $user->api_token = $user->createToken($input['email'], $permissions)->plainTextToken;
+
+                    // Assign default plan subscription & initial units
+                    $plan = \App\Models\Plan::where('is_default', 1)->first() ?? \App\Models\Plan::where('status', 1)->first() ?? \App\Models\Plan::first();
+                    if ($plan) {
+                        $subscription = new \App\Models\Subscription();
+                        $subscription->user_id = $user->id;
+                        $subscription->start_at = now();
+                        $subscription->status = \App\Models\Subscription::STATUS_ACTIVE;
+                        $subscription->plan_id = $plan->id;
+                        $subscription->end_period_last_days = '10';
+                        $subscription->current_period_ends_at = $subscription->getPeriodEndsAt(now()) ?? now()->addYears(10);
+                        $subscription->save();
+
+                        // Set initial SMS units if customer does not have any set
+                        if (empty($user->sms_unit) || $user->sms_unit === '0' || $user->sms_unit === 0) {
+                            $user->sms_unit = $plan->getOption('sms_max') ?: '100';
+                        }
+                    }
+
                     $user->save();
 
                     return $user;

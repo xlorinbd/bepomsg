@@ -521,6 +521,9 @@ use App\Notifications\WelcomeEmailNotification;
                 }
 
                 if ($customer->update($updateData)) {
+                    if ($newStatus) {
+                        $customer->customer?->activeSubscription();
+                    }
                     return response()->json([
                         'status'  => 'success',
                         'message' => __('locale.customer.customer_successfully_change'),

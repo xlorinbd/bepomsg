@@ -256,7 +256,7 @@
                 ]);
             }
 
-            $plan = Plan::where('status', true)->find($activeSubscription->plan_id);
+            $plan = $activeSubscription->plan ?? Plan::find($activeSubscription->plan_id) ?? Plan::first();
 
             if ( ! $plan) {
                 return redirect()->route('customer.automations.say.happy.birthday')->with([
