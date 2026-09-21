@@ -42,7 +42,7 @@
                     @endphp
 
                     @foreach($sidebarMenu as $menu)
-
+                        @continue(isset($menu->navheader))
 
                         {{-- Add Custom Class with nav-item --}}
                         @php

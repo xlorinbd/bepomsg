@@ -78,7 +78,9 @@
         COUNT(CASE WHEN customer_status = "Rejected" THEN 1 END) as rejected_count,
         COUNT(CASE WHEN customer_status = "Accepted" THEN 1 END) as accepted_count,
         COUNT(CASE WHEN customer_status = "Skipped" THEN 1 END) as skipped_count,
-        COUNT(CASE WHEN customer_status NOT IN ("Enroute", "Delivered", "Expired", "Undelivered", "Rejected", "Accepted", "Skipped") THEN 1 END) as failed_count
+        COUNT(CASE WHEN customer_status NOT IN ("Enroute", "Delivered", "Expired", "Undelivered", "Rejected", "Accepted", "Skipped") THEN 1 END) as failed_count,
+        COUNT(*) as total_count,
+        COALESCE(SUM(credits_deducted), 0) / NULLIF(COUNT(*), 0) as avg_credits
     ')
                 ->first();
 

@@ -20,160 +20,53 @@
 @section('content')
 
     <!-- Basic table -->
-    <section id="datatables-basic">
+    <section id="datatables-basic" class="bm-page">
 
-        <div class="row match-height">
-            <div class="col-lg-3 col-sm-6 col-12">
-                <div class="card">
-                    <div class="card-header">
-                        <div>
-                            <h2 class="fw-bolder mb-0">{{ $reportStatusCounts->delivered_count }}</h2>
-                            <p class="card-text">{{  __('locale.labels.delivered') }}</p>
-                        </div>
+        @php
+            $bmc         = $reportStatusCounts;
+            $bmSent      = (int) $bmc->total_count;
+            $bmDelivered = (int) $bmc->delivered_count;
+            $bmFailed    = (int) $bmc->failed_count + (int) $bmc->undelivered_count + (int) $bmc->rejected_count + (int) $bmc->expired_count;
+            $bmOther     = [
+                'enroute'  => [$bmc->enroute_count, 'info'],
+                'accepted' => [$bmc->accepted_count, 'info'],
+                'skipped'  => [$bmc->skipped_count, 'mute'],
+                'expired'  => [$bmc->expired_count, 'warn'],
+                'rejected' => [$bmc->rejected_count, 'bad'],
+                'undelivered' => [$bmc->undelivered_count, 'bad'],
+            ];
+        @endphp
 
-                        <div class="avatar bg-light-success p-50 m-0">
-                            <div class="avatar-content">
-                                <i data-feather="check-square" class="font-medium-5"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+        <div class="bm-grid bm-grid--stats-sm">
+            <div class="bm-stat">
+                <span class="bm-stat__label">{{ __('portal.total_sent') }}</span>
+                <span class="bm-stat__value">{{ number_format($bmSent) }}</span>
             </div>
-
-            <div class="col-lg-3 col-sm-6 col-12">
-                <div class="card">
-                    <div class="card-header">
-                        <div>
-                            <h2 class="fw-bolder mb-0">{{ $reportStatusCounts->enroute_count }}</h2>
-                            <p class="card-text">{{  __('locale.labels.enroute') }}</p>
-                        </div>
-
-                        <div class="avatar bg-light-primary p-50 m-0">
-                            <div class="avatar-content">
-                                <i data-feather="truck" class="font-medium-5"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <div class="bm-stat">
+                <span class="bm-stat__label">{{ __('locale.labels.delivered') }}</span>
+                <span class="bm-stat__value bm-stat__value--ok">{{ number_format($bmDelivered) }}</span>
             </div>
-
-            <div class="col-lg-3 col-sm-6 col-12">
-                <div class="card">
-                    <div class="card-header">
-                        <div>
-                            <h2 class="fw-bolder mb-0">{{ $reportStatusCounts->expired_count }}</h2>
-                            <p class="card-text">{{  __('locale.labels.expired') }}</p>
-                        </div>
-
-                        <div class="avatar bg-light-warning p-50 m-0">
-                            <div class="avatar-content">
-                                <i data-feather="alert-triangle" class="font-medium-5"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <div class="bm-stat">
+                <span class="bm-stat__label">{{ __('locale.labels.failed') }}</span>
+                <span class="bm-stat__value bm-stat__value--bad">{{ number_format($bmFailed) }}</span>
             </div>
-
-
-            <div class="col-lg-3 col-sm-6 col-12">
-                <div class="card">
-                    <div class="card-header">
-                        <div>
-                            <h2 class="fw-bolder mb-0">{{ $reportStatusCounts->undelivered_count }}</h2>
-                            <p class="card-text">{{  __('locale.labels.undelivered') }}</p>
-                        </div>
-
-                        <div class="avatar bg-light-danger p-50 m-0">
-                            <div class="avatar-content">
-                                <i data-feather="x-square" class="font-medium-5"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <div class="bm-stat">
+                <span class="bm-stat__label">{{ __('portal.avg_credits') }}</span>
+                <span class="bm-stat__value">{{ number_format((float) $bmc->avg_credits, 2) }}</span>
             </div>
-
-
         </div>
 
-        <div class="row match-height">
-            <div class="col-lg-3 col-sm-6 col-12">
-                <div class="card">
-                    <div class="card-header">
-                        <div>
-                            <h2 class="fw-bolder mb-0">{{ $reportStatusCounts->rejected_count }}</h2>
-                            <p class="card-text">{{  __('locale.labels.rejected') }}</p>
-                        </div>
-
-                        <div class="avatar bg-light-danger p-50 m-0">
-                            <div class="avatar-content">
-                                <i data-feather="x-circle" class="font-medium-5"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-lg-3 col-sm-6 col-12">
-                <div class="card">
-                    <div class="card-header">
-                        <div>
-                            <h2 class="fw-bolder mb-0">{{ $reportStatusCounts->accepted_count }}</h2>
-                            <p class="card-text">{{  __('locale.labels.accepted') }}</p>
-                        </div>
-
-                        <div class="avatar bg-light-primary p-50 m-0">
-                            <div class="avatar-content">
-                                <i data-feather="check-circle" class="font-medium-5"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-lg-3 col-sm-6 col-12">
-                <div class="card">
-                    <div class="card-header">
-                        <div>
-                            <h2 class="fw-bolder mb-0">{{ $reportStatusCounts->skipped_count }}</h2>
-                            <p class="card-text">{{  __('locale.labels.skipped') }}</p>
-                        </div>
-
-                        <div class="avatar bg-light-warning p-50 m-0">
-                            <div class="avatar-content">
-                                <i data-feather="skip-forward" class="font-medium-5"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-
-            <div class="col-lg-3 col-sm-6 col-12">
-                <div class="card">
-                    <div class="card-header">
-                        <div>
-                            <h2 class="fw-bolder mb-0">{{ $reportStatusCounts->failed_count }}</h2>
-                            <p class="card-text">{{  __('locale.labels.failed') }}</p>
-                        </div>
-
-                        <div class="avatar bg-light-danger p-50 m-0">
-                            <div class="avatar-content">
-                                <i data-feather="x-octagon" class="font-medium-5"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-
+        <div class="bm-row" style="gap: 8px;">
+            @foreach($bmOther as $bmKey => [$bmCount, $bmTone])
+                <x-bm.pill :tone="$bmTone">{{ __('locale.labels.' . $bmKey) }} · {{ number_format((int) $bmCount) }}</x-bm.pill>
+            @endforeach
         </div>
 
-
-        <div class="mb-3 mt-2">
+        <div class="bm-row">
             @if(Auth::user()->customer->getOption('delete_sms_history') == 'yes')
                 <div class="btn-group">
                     <button
-                            class="btn btn-primary fw-bold dropdown-toggle"
+                            class="bm-btn dropdown-toggle"
                             type="button"
                             id="bulk_actions"
                             data-bs-toggle="dropdown"
@@ -190,7 +83,7 @@
 
             @if(Auth::user()->customer->getOption('list_export') == 'yes')
                 <div class="btn-group">
-                    <a href="#" class="btn btn-info waves-light waves-effect fw-bold mx-1" data-bs-toggle="modal"
+                    <a href="#" class="bm-btn" data-bs-toggle="modal"
                        data-bs-target="#exportData"> {{__('locale.buttons.export')}} <i
                                 data-feather="file-text"></i></a>
                 </div>
@@ -413,12 +306,10 @@
             </div>
         </div>
 
-        <div class="row">
-            <div class="col-12">
-                <div class="card">
-
-
-                    <div id="processingLoader" class="processing-loader" style="display: none;">
+        <div class="bm-card bm-card--flush bm-dt">
+<div>
+<div>
+<div id="processingLoader" class="processing-loader" style="display: none;">
                         <div class="card">
                             <div class="card-body">
                                 <div class="d-flex align-items-center">

@@ -60,14 +60,14 @@ $switch-lg-us-size: 7.5rem;
   height: 32px;
 }
 //  -------------------------------
-//  Bengali Font
+//  Bengali Font — IBM Plex Sans for Latin, Hind Siliguri for Bangla script
 //  -------------------------------
 html[lang="bn"] {
   body {
-    font-family: 'Noto Serif Bengali', serif !important;
+    font-family: 'IBM Plex Sans', 'Hind Siliguri', sans-serif !important;
   }
-  
+
   h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
-    font-family: 'Noto Serif Bengali', serif !important;
+    font-family: 'IBM Plex Sans', 'Hind Siliguri', sans-serif !important;
   }
 }

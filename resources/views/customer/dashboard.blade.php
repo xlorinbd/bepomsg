@@ -1,4 +1,15 @@
-@php use App\Library\Tool; @endphp
+@php
+    use App\Library\Tool;
+
+    // Secondary channels (voice/MMS/WhatsApp/Viber/OTP): permissions + label key, used by cards and charts
+    $bmExtra = [
+        'voice'    => [['voice_campaign_builder', 'voice_quick_send', 'voice_bulk_messages'], 'voice_sms'],
+        'mms'      => [['mms_campaign_builder', 'mms_quick_send', 'mms_bulk_messages'], 'mms_sms'],
+        'whatsapp' => [['whatsapp_campaign_builder', 'whatsapp_quick_send', 'whatsapp_bulk_messages'], 'whatsapp_sms'],
+        'viber'    => [['viber_campaign_builder', 'viber_quick_send', 'viber_bulk_messages'], 'viber_sms'],
+        'otp'      => [['otp_campaign_builder', 'otp_quick_send', 'otp_bulk_messages'], 'otp_sms'],
+    ];
+@endphp
 @extends('layouts/contentLayoutMaster')
 
 @section('title', __('locale.menu.Dashboard'))
@@ -119,396 +130,133 @@
             </div>
         @endunless
 
-        <div class="row match-height">
-            <div class="col-lg-6 col-sm-6 col-12">
-                <div class="card">
-                    <div class="card-header"></div>
-                    <div class="card-body">
-                        <h3 class="text-primary">{{ \App\Helpers\Helper::greetingMessage()}}</h3>
-                        <p class="font-medium-2 mt-2">{{ __('locale.description.dashboard', ['brandname' => config('app.name')]) }}</p>
+        @php
+            $bmTotal     = max((int) $total_sms_sent, 0);
+            $bmDelivered = (int) $deliveredCount;
+            $bmFailed    = (int) $undeliveredCount;
+            $bmRate      = $bmTotal > 0 ? round($bmDelivered / $bmTotal * 100, 1) : 0;
+            $bmFailRate  = $bmTotal > 0 ? round($bmFailed / $bmTotal * 100, 1) : 0;
+            $bmWeekTotal = $weekStats->sum(fn ($d) => $d['plain'] + $d['unicode']);
+            $bmWeekMax   = max(1, $weekStats->max(fn ($d) => $d['plain'] + $d['unicode']));
+            $bmCustomer  = Auth::user()->customer;
+            $bmContacts  = $bmCustomer ? (int) $bmCustomer->subscriberCounts() : 0;
+            $bmGroups    = $bmCustomer ? (int) $bmCustomer->listsCount() : 0;
+        @endphp
 
-                        <div class="row d-flex justify-content-center">
-                            @can('sms_quick_send')
-                                <div class="col-lg-4 col-sm-6 col-6 pb-1">
-                                    <a href="{{ route('customer.sms.quick_send') }}"
-                                       class="btn btn-sm btn-warning w-100 text-nowrap"><i
-                                                data-feather="send"></i>
+        <div class="bm-page">
 
-                                        <span>{{__('locale.menu.Quick Send')}}</span>
-                                    </a>
-                                </div>
-                            @endcan
+            <div>
+                <h1 class="bm-page-title">{{ \App\Helpers\Helper::greetingMessage() }}</h1>
+                <div class="bm-page-sub">{{ __('portal.week_sent', ['count' => Tool::format_number($bmWeekTotal)]) }}</div>
+            </div>
 
-                            @can('sms_campaign_builder')
-                                <div class="col-lg-4 col-sm-6 col-6 pb-1">
-                                    <a href="{{ route('customer.sms.campaign_builder') }}"
-                                       class="btn btn-sm btn-success w-200 text-nowrap"><i
-                                                data-feather="server"></i>
-
-                                        <span>{{__('locale.menu.Campaign Builder')}}</span></a>
-                                </div>
-                            @endcan
-
-                            @can('view_contact_group')
-                                <div class="col-lg-4 col-sm-6 col-6 pb-1">
-                                    <a href="{{ route('customer.contacts.index') }}"
-                                       class="btn btn-sm btn-info text-nowrap"><i
-                                                data-feather="user"></i>
-                                        <span>{{__('locale.contacts.contact_groups')}}</span>
-                                    </a>
-                                </div>
-                            @endcan
-
-
-                        </div>
-
-                    </div>
+            {{-- Stat tiles --}}
+            <div class="bm-grid bm-grid--stats">
+                <div class="bm-stat">
+                    <span class="bm-stat__label">SMS Credits Balance</span>
+                    <span class="bm-stat__value">{{ number_format(Auth::user()->sms_balance) }}</span>
+                    <a class="bm-stat__sub bm-stat__sub--link" href="{{ route('customer.buy_sms.index') }}">Buy SMS →</a>
+                </div>
+                <div class="bm-stat">
+                    <span class="bm-stat__label">{{ __('locale.labels.delivered') }}</span>
+                    <span class="bm-stat__value">{{ number_format($bmDelivered) }}</span>
+                    <span class="bm-stat__sub bm-stat__sub--ok">{{ __('portal.delivery_rate', ['rate' => $bmRate]) }}</span>
+                </div>
+                <div class="bm-stat">
+                    <span class="bm-stat__label">{{ __('locale.labels.failed') }}</span>
+                    <span class="bm-stat__value">{{ number_format($bmFailed) }}</span>
+                    <a class="bm-stat__sub bm-stat__sub--bad" href="{{ route('customer.reports.all') }}">{{ $bmFailRate }}% · {{ __('portal.view_report') }}</a>
+                </div>
+                <div class="bm-stat">
+                    <span class="bm-stat__label">{{ __('locale.menu.Contacts') }}</span>
+                    <span class="bm-stat__value">{{ number_format($bmContacts) }}</span>
+                    <span class="bm-stat__sub">{{ __('portal.in_groups', ['count' => $bmGroups]) }}</span>
                 </div>
             </div>
 
+            <div class="bm-grid bm-grid--split" style="--bm-cols: minmax(0, 2fr) minmax(0, 1fr);">
 
-            {{-- SMS Balance Card (credit system) --}}
-            <div class="col-lg-3 col-sm-6 col-12">
-                <div class="card">
-                    <div class="card-header">
-                        <div>
-                            <h2 class="fw-bolder mb-0">{{ number_format(Auth::user()->sms_balance) }}</h2>
-                            <p class="card-text">SMS Credits Balance</p>
-                        </div>
-                        <a href="{{ route('customer.buy_sms.index') }}">
-                            <div class="avatar bg-light-primary p-50 m-0">
-                                <div class="avatar-content">
-                                    <i data-feather="message-circle" class="text-primary font-medium-5"></i>
-                                </div>
-                            </div>
-                        </a>
-                    </div>
-                    <div class="card-footer py-75">
-                        <div class="d-flex justify-content-between">
-                            <a href="{{ route('customer.buy_sms.index') }}"
-                               class="btn btn-sm btn-primary waves-effect waves-light w-100 me-1">
-                                <i data-feather="plus-circle"></i> Buy SMS
-                            </a>
-                            <a href="{{ route('customer.buy_sms.history') }}"
-                               class="btn btn-sm btn-outline-primary waves-effect waves-light w-100">
-                                <i data-feather="clock"></i> My Orders
-                            </a>
+                {{-- SMS statistics: last 7 days, Plain vs Unicode --}}
+                <div class="bm-card">
+                    <div class="bm-row bm-row--between">
+                        <span class="bm-card__title">SMS Statistics</span>
+                        <div class="bm-legend">
+                            <span><i style="background: var(--bm-primary)"></i>Plain</span>
+                            <span><i style="background: #c7d2fe"></i>Unicode</span>
                         </div>
                     </div>
-                </div>
-            </div>
-
-            <div class="col-lg-3 col-sm-6 col-12">
-                <div class="card">
-                    <div class="card-header d-flex justify-content-between align-items-end">
-                        <h4 class="card-title text-uppercase">{{ __('locale.labels.sms_reports') }}</h4>
-                    </div>
-                    <div class="card-content">
-                        <div class="card-body p-0">
-                            <div id="sms-reports" class="my-2"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-
-        <div class="row match-height">
-
-            <div class="col-lg-3 col-sm-6 col-12">
-                <div class="card">
-                    <div class="card-header">
-                        <div>
-                            <h2 class="fw-bolder mb-0">
-
-                                @php
-                                    $campaigns = \App\Models\Campaigns::where('user_id', Auth::user()->id);
-                                    $totalCamp = $campaigns->count();
-                                    $deliveredCamp = $campaigns->where('status', '!=', \App\Models\Campaigns::STATUS_DONE)->count();
-                                @endphp
-
-                                <sup>{{ $deliveredCamp }}</sup>
-                                / {{ $totalCamp }}</h2>
-                            <p class="card-text">{{ str_plural(__('locale.menu.Campaigns')) }}</p>
-                        </div>
-                        <a href="{{route('customer.reports.campaigns')}}">
-                            <div class="avatar bg-light-info p-50 m-0">
-                                <div class="avatar-content">
-                                    <i data-feather="pie-chart" class="text-info font-medium-5"></i>
-                                </div>
-                            </div>
-                        </a>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-lg-3 col-sm-6 col-12">
-                <div class="card">
-                    <div class="card-header">
-                        <div>
-                            <h2 class="fw-bolder mb-0">
-
-                                <sup>{{ $deliveredCount }}</sup>
-                                / {{ $total_sms_sent }}</h2>
-                            <p class="card-text">{{ __('locale.labels.delivered') }}</p>
-                        </div>
-                        <a href="{{route('customer.reports.all')}}">
-                            <div class="avatar bg-light-success p-50 m-0">
-                                <div class="avatar-content">
-                                    <i data-feather="phone-outgoing" class="text-success font-medium-5"></i>
-                                </div>
-                            </div>
-                        </a>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-lg-3 col-sm-6 col-12">
-                <div class="card">
-                    <div class="card-header">
-                        <div>
-                            <h2 class="fw-bolder mb-0">
-
-                                <sup>{{ $undeliveredCount }}</sup>
-                                / {{ $total_sms_sent }}</h2>
-                            <p class="card-text">{{ __('locale.labels.failed') }}</p>
-                        </div>
-                        <a href="{{route('customer.reports.all')}}">
-                            <div class="avatar bg-light-danger p-50 m-0">
-                                <div class="avatar-content">
-                                    <i data-feather="x-square" class="text-danger font-medium-5"></i>
-                                </div>
-                            </div>
-                        </a>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-lg-3 col-sm-6 col-12">
-                <div class="card">
-                    <div class="card-header">
-                        <div>
-                            <h2 class="fw-bolder mb-0">{{ Auth::user()->customer->smsTemplateCounts() }}</h2>
-                            <p class="card-text">{{ str_plural(__('locale.permission.sms_template')) }}</p>
-                        </div>
-                        <a href="{{ route('customer.templates.index') }}">
-                            <div class="avatar bg-light-warning p-50 m-0">
-                                <div class="avatar-content">
-                                    <i data-feather="inbox" class="text-warning font-medium-5"></i>
-                                </div>
-                            </div>
-                        </a>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-
-        <div class="row match-height">
-
-            <div class="col-lg-3 col-sm-6 col-12">
-                <div class="card">
-                    <div class="card-header">
-                        @if(isset(Auth::user()->customer))
-                            <div>
-                                <h2 class="fw-bolder mb-0"> {{ Auth::user()->customer->listsCount() != null ? Tool::format_number(Auth::user()->customer->listsCount()): 0 }}</h2>
-                                <p class="card-text">{{ __('locale.contacts.contact_groups') }}</p>
-                            </div>
-                        @else
-                            <div>
-                                <h2 class="fw-bolder mb-0"> 0</h2>
-                                <p class="card-text">{{ __('locale.contacts.contact_groups') }}</p>
-                            </div>
+                    <div class="bm-bars" @if($bmWeekTotal === 0) style="align-items: center; justify-content: center;" @endif>
+                        @if($bmWeekTotal === 0)
+                            <span class="bm-muted" style="font-size: 13px;">{{ __('portal.no_data') }}</span>
                         @endif
-                        <a href="{{ route('customer.contacts.index') }}">
-                            <div class="avatar bg-light-primary p-50 m-0">
-                                <div class="avatar-content">
-                                    <i data-feather="users" class="text-primary font-medium-5"></i>
-                                </div>
+                        @foreach($weekStats as $day)
+                            <div class="bm-bars__col" title="{{ $day['label'] }} — Plain {{ $day['plain'] }} · Unicode {{ $day['unicode'] }}">
+                                @if($day['unicode'] > 0)
+                                    <div class="bm-bars__bar bm-bars__bar--uni" style="height: {{ max(2, round($day['unicode'] / $bmWeekMax * 100, 1)) }}%"></div>
+                                @endif
+                                @if($day['plain'] > 0)
+                                    <div class="bm-bars__bar" style="height: {{ max(2, round($day['plain'] / $bmWeekMax * 100, 1)) }}%"></div>
+                                @endif
                             </div>
-                        </a>
+                        @endforeach
+                    </div>
+                    <div class="bm-bars-axis">
+                        @foreach($weekStats as $day)
+                            <span>{{ $day['label'] }}</span>
+                        @endforeach
                     </div>
                 </div>
-            </div>
 
-            <div class="col-lg-3 col-sm-6 col-12">
-                <div class="card">
-                    <div class="card-header">
-                        @if(isset(Auth::user()->customer))
-                            <div>
-                                <h2 class="fw-bolder mb-0">{{ Auth::user()->customer->subscriberCounts() != null ? Tool::format_number(Auth::user()->customer->subscriberCounts()) : 0 }}</h2>
-                                <p class="card-text">{{ __('locale.menu.Contacts') }}</p>
-                            </div>
-                        @else
-                            <div>
-                                <h2 class="fw-bolder mb-0">0</h2>
-                                <p class="card-text">{{ __('locale.menu.Contacts') }}</p>
-                            </div>
-                        @endif
-                        <a href="{{ route('customer.contacts.index') }}">
-                            <div class="avatar bg-light-success p-50 m-0">
-                                <div class="avatar-content">
-                                    <i data-feather="user" class="text-success font-medium-5"></i>
-                                </div>
-                            </div>
-                        </a>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-lg-3 col-sm-6 col-12">
-                <div class="card">
-                    <div class="card-header">
-                        <div>
-                            <h2 class="fw-bolder mb-0">
-                                <sup>{{ \App\Models\Invoices::where('user_id', Auth::user()->id)->where('status', \App\Models\Invoices::STATUS_UNPAID)->orWhere('status', \App\Models\Invoices::STATUS_PENDING)->count() }}</sup>
-                                / {{ \App\Models\Invoices::where('user_id', Auth::user()->id)->count() }}</h2>
-                            <p class="card-text">{{ str_plural(__('locale.menu.Invoices')) }}</p>
+                {{-- Sender IDs --}}
+                <div class="bm-card">
+                    <span class="bm-card__title">Sender IDs</span>
+                    @forelse($senderIds as $sid)
+                        <div class="bm-row bm-row--between" style="flex-wrap: nowrap; {{ $loop->last ? '' : 'padding-bottom: 10px; border-bottom: 1px solid var(--bm-line-soft);' }}">
+                            <span class="bm-trunc" style="font-size: 13px; font-weight: 500;">{{ $sid->sender_id }}</span>
+                            <x-bm.status :value="$sid->status" />
                         </div>
-                        <a href="{{ route('customer.invoices.index') }}">
-                            <div class="avatar bg-light-info p-50 m-0">
-                                <div class="avatar-content">
-                                    <i data-feather="shopping-cart" class="text-info font-medium-5"></i>
-                                </div>
-                            </div>
-                        </a>
-                    </div>
-                    <div class="card-footer py-75">
-                        <a href="{{ route('customer.invoices.index') }}"
-                           class="btn btn-sm btn-outline-info waves-effect waves-light w-100">
-                            <i data-feather="file-text"></i> My Invoices
-                        </a>
-                    </div>
+                    @empty
+                        <span class="bm-muted" style="font-size: 13px;">{{ __('portal.no_sender_ids') }}</span>
+                    @endforelse
+                    <a class="bm-btn bm-btn--block" style="margin-top: auto;" href="{{ route('customer.senderid.request') }}">{{ __('portal.request_sender_id') }}</a>
                 </div>
             </div>
 
-            <div class="col-lg-3 col-sm-6 col-12">
-                <div class="card">
-                    <div class="card-header">
-                        <div>
-                            <h2 class="fw-bolder mb-0">{{ Auth::user()->customer->blacklistCounts() }}</h2>
-                            <p class="card-text">{{ str_plural(__('locale.menu.Blacklist')) }}</p>
-                        </div>
-                        <a href="{{ route('customer.blacklists.index') }}">
-                            <div class="avatar bg-light-danger p-50 m-0">
-                                <div class="avatar-content">
-                                    <i data-feather="user-x" class="text-danger font-medium-5"></i>
-                                </div>
-                            </div>
-                        </a>
+            {{-- Recent campaigns --}}
+            <div class="bm-card bm-card--flush">
+                <div class="bm-card__head">
+                    <span class="bm-card__title">{{ __('portal.recent_campaigns') }}</span>
+                    <a class="bm-link" href="{{ route('customer.reports.campaigns') }}">{{ __('portal.view_all') }}</a>
+                </div>
+                <div class="bm-tbl" style="--bm-cols: minmax(0, 2fr) repeat(4, minmax(0, 1fr));">
+                    <div class="bm-tbl__head">
+                        <span>Campaign</span><span>Type</span><span>Recipients</span><span>Delivered</span><span>Status</span>
                     </div>
+                    @forelse($recentCampaigns as $campaign)
+                        <div class="bm-tbl__row">
+                            <span style="font-weight: 500;">{{ $campaign->campaign_name }}</span>
+                            <span class="bm-muted">{{ ucfirst($campaign->sms_type) }}</span>
+                            <span class="bm-mono">{{ number_format($campaign->contactCount(true)) }}</span>
+                            <span class="bm-mono">{{ $campaign->status === \App\Models\Campaigns::STATUS_DONE ? number_format($campaign->deliveredCount(true)) : '—' }}</span>
+                            <x-bm.status :value="$campaign->status" />
+                        </div>
+                    @empty
+                        <div class="bm-tbl__row"><span class="bm-muted" style="grid-column: 1 / -1;">{{ __('portal.no_campaigns') }}</span></div>
+                    @endforelse
                 </div>
             </div>
+
+            {{-- Other channels the account can use (voice / MMS / WhatsApp / Viber / OTP) --}}
+            @foreach($bmExtra as $channel => [$permissions, $labelKey])
+                @canany($permissions)
+                    <div class="bm-card">
+                        <span class="bm-card__title">{{ __('locale.labels.sms_statistics', ['sms_type' => __('locale.labels.' . $labelKey)]) }}</span>
+                        <div id="{{ $channel }}_sms_data"></div>
+                    </div>
+                @endcanany
+            @endforeach
+
         </div>
-
-
-        @canany(['quick_send', 'sms_campaign_builder', 'sms_bulk_messages'])
-            <div class="row match-height">
-                <div class="col-12">
-                    <div class="card">
-                        <div class="card-header d-flex justify-content-between align-items-center">
-                            <h4 class="card-title text-uppercase">{{ __('locale.labels.sms_statistics', ['sms_type' => __('locale.labels.plain_sms')]) }}</h4>
-                        </div>
-                        <div class="card-body">
-                            <div id="plain_sms_data"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="row match-height">
-                <div class="col-12">
-                    <div class="card">
-                        <div class="card-header d-flex justify-content-between align-items-center">
-                            <h4 class="card-title text-uppercase">{{ __('locale.labels.sms_statistics', ['sms_type' => __('locale.labels.unicode_sms')]) }}</h4>
-                        </div>
-                        <div class="card-body">
-                            <div id="unicode_sms_data"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        @endcanany
-
-        @canany(['voice_campaign_builder', 'voice_quick_send', 'voice_bulk_messages'])
-            <div class="row match-height">
-                <div class="col-12">
-                    <div class="card">
-                        <div class="card-header d-flex justify-content-between align-items-center">
-                            <h4 class="card-title text-uppercase">{{ __('locale.labels.sms_statistics', ['sms_type' => __('locale.labels.voice_sms')]) }}</h4>
-                        </div>
-                        <div class="card-body">
-                            <div id="voice_sms_data"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        @endcanany
-
-
-        @canany(['mms_campaign_builder', 'mms_quick_send', 'mms_bulk_messages'])
-            <div class="row match-height">
-                <div class="col-12">
-                    <div class="card">
-                        <div class="card-header d-flex justify-content-between align-items-center">
-                            <h4 class="card-title text-uppercase">{{ __('locale.labels.sms_statistics', ['sms_type' => __('locale.labels.mms_sms')]) }}</h4>
-                        </div>
-                        <div class="card-body">
-                            <div id="mms_sms_data"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        @endcanany
-
-
-        @canany(['whatsapp_campaign_builder', 'whatsapp_quick_send', 'whatsapp_bulk_messages'])
-            <div class="row match-height">
-                <div class="col-12">
-                    <div class="card">
-                        <div class="card-header d-flex justify-content-between align-items-center">
-                            <h4 class="card-title text-uppercase">{{ __('locale.labels.sms_statistics', ['sms_type' => __('locale.labels.whatsapp_sms')]) }}</h4>
-                        </div>
-                        <div class="card-body">
-                            <div id="whatsapp_sms_data"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        @endcanany
-
-
-        @canany(['viber_campaign_builder', 'viber_quick_send', 'viber_bulk_messages'])
-            <div class="row match-height">
-                <div class="col-12">
-                    <div class="card">
-                        <div class="card-header d-flex justify-content-between align-items-center">
-                            <h4 class="card-title text-uppercase">{{ __('locale.labels.sms_statistics', ['sms_type' => __('locale.labels.viber_sms')]) }}</h4>
-                        </div>
-                        <div class="card-body">
-                            <div id="viber_sms_data"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        @endcanany
-
-
-        @canany(['otp_campaign_builder', 'otp_quick_send', 'otp_bulk_messages'])
-            <div class="row match-height">
-                <div class="col-12">
-                    <div class="card">
-                        <div class="card-header d-flex justify-content-between align-items-center">
-                            <h4 class="card-title text-uppercase">{{ __('locale.labels.sms_statistics', ['sms_type' => __('locale.labels.otp_sms')]) }}</h4>
-                        </div>
-                        <div class="card-body">
-                            <div id="otp_sms_data"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        @endcanany
-
 
         @endif
     </section>
@@ -525,26 +273,7 @@
 @section('page-script')
 
     <script>
-        function percentage(partialValue, totalValue) {
-            return (100 * partialValue) / totalValue;
-        }
-
         $(window).on("load", function () {
-
-            let $strok_color = "#b9c3cd";
-            let $label_color = "#e7eef7";
-            let $purple = "#df87f2";
-            let $textMutedColor = '#b9b9c3';
-            let $stroke_color_2 = '#d0ccff';
-
-            let $plainSmsData = document.querySelector('#plain_sms_data');
-            let $unicodeSmsData = document.querySelector('#unicode_sms_data');
-            let $voiceSmsData = document.querySelector('#voice_sms_data');
-            let $mmsSmsData = document.querySelector('#mms_sms_data');
-            let $whatsappSmsData = document.querySelector('#whatsapp_sms_data');
-            let $viberSmsData = document.querySelector('#viber_sms_data');
-            let $otpSmsData = document.querySelector('#otp_sms_data');
-
 
             $(".mark_read").on("click", function (e) {
                 e.stopPropagation();
@@ -581,138 +310,47 @@
 
             });
 
+            // Flat line chart for the secondary channel cards (zinc grid, indigo accent)
             function createChartOptions(height, xAxis, dataSet) {
+                const muted = '#71717a';
                 return {
-                    chart: {
-                        height: height,
-                        toolbar: {show: false},
-                        zoom: {enabled: false},
-                        type: 'line',
-                        offsetX: -10
-                    },
-                    stroke: {
-                        curve: 'smooth',
-                        dashArray: [0, 5, 12],
-                        width: [5, 7, 5]
-                    },
-                    grid: {
-                        borderColor: $label_color,
-                        padding: {
-                            top: -20,
-                            bottom: -10,
-                            left: 20
-                        }
-                    },
-                    legend: {
-                        show: false
-                    },
-                    colors: [$stroke_color_2, $strok_color, $purple],
-                    fill: {
-                        type: 'gradient',
-                        gradient: {
-                            shade: 'dark',
-                            inverseColors: false,
-                            gradientToColors: [window.colors.solid.primary, $strok_color, $stroke_color_2],
-                            shadeIntensity: 1,
-                            type: 'horizontal',
-                            opacityFrom: 1,
-                            opacityTo: 1,
-                            stops: [0, 100, 100, 100]
-                        }
-                    },
-                    markers: {
-                        size: 0,
-                        hover: {
-                            size: 5
-                        }
-                    },
+                    chart: {height: height, toolbar: {show: false}, zoom: {enabled: false}, type: 'line', fontFamily: 'inherit'},
+                    stroke: {curve: 'smooth', width: 2},
+                    grid: {borderColor: '#f4f4f5'},
+                    legend: {show: true, position: 'top', horizontalAlign: 'right', labels: {colors: muted}},
+                    colors: ['#4f46e5', '#c7d2fe', '#a1a1aa'],
+                    markers: {size: 0, hover: {size: 4}},
                     xaxis: {
-                        labels: {
-                            style: {
-                                colors: $textMutedColor,
-                                fontSize: '1rem'
-                            }
-                        },
-                        axisTicks: {
-                            show: false
-                        },
-                        categories: xAxis,
-                        axisBorder: {
-                            show: false
-                        },
-                        tickPlacement: 'on'
+                        labels: {style: {colors: muted, fontSize: '12px'}},
+                        axisTicks: {show: false},
+                        axisBorder: {show: false},
+                        categories: xAxis
                     },
                     yaxis: {
                         tickAmount: 5,
                         labels: {
-                            style: {
-                                colors: $textMutedColor,
-                                fontSize: '1rem'
-                            },
+                            style: {colors: muted, fontSize: '12px'},
                             formatter: function (val) {
                                 return val > 999 ? (val / 1000).toFixed(0) + 'k' : val;
                             }
                         }
                     },
-                    tooltip: {
-                        x: {show: false}
-                    },
+                    tooltip: {x: {show: false}},
                     series: dataSet
                 };
             }
 
-            // Instantiate the charts
-            let plainSmsData = new ApexCharts($plainSmsData, createChartOptions(240, {!! $charts['plain']->xAxis() !!}, {!! $charts['plain']->dataSet() !!}));
-            plainSmsData.render();
-
-            let unicodeSmsData = new ApexCharts($unicodeSmsData, createChartOptions(240, {!! $charts['unicode']->xAxis() !!}, {!! $charts['unicode']->dataSet() !!}));
-            unicodeSmsData.render();
-
-            let voiceSmsData = new ApexCharts($voiceSmsData, createChartOptions(240, {!! $charts['voice']->xAxis() !!}, {!! $charts['voice']->dataSet() !!}));
-            voiceSmsData.render();
-
-            let mmsSmsData = new ApexCharts($mmsSmsData, createChartOptions(240, {!! $charts['mms']->xAxis() !!}, {!! $charts['mms']->dataSet() !!}));
-            mmsSmsData.render();
-
-            let whatsappSmsData = new ApexCharts($whatsappSmsData, createChartOptions(240, {!! $charts['whatsapp']->xAxis() !!}, {!! $charts['whatsapp']->dataSet() !!}));
-            whatsappSmsData.render();
-
-            let viberSmsData = new ApexCharts($viberSmsData, createChartOptions(240, {!! $charts['viber']->xAxis() !!}, {!! $charts['viber']->dataSet() !!}));
-            viberSmsData.render();
-
-            let otpSmsData = new ApexCharts($otpSmsData, createChartOptions(240, {!! $charts['otp']->xAxis() !!}, {!! $charts['otp']->dataSet() !!}));
-            otpSmsData.render();
-
-
-            // sms history Chart
-            // -----------------------------
-
-            let smsHistoryChartoptions = {
-                chart: {
-                    type: "pie",
-                    height: 180,
-                    toolbar: {
-                        show: false
-                    }
-                },
-                labels: ["{{ __('locale.labels.delivered') }}", "{{ __('locale.labels.failed') }}"],
-                series: {!! $sms_history->dataSet() !!},
-                dataLabels: {
-                    enabled: false
-                },
-                legend: {show: false},
-                stroke: {
-                    width: 4
-                },
-                colors: ["#4F46E5", "#EA5455"]
+            const extraCharts = {
+                @foreach($bmExtra as $channel => $cfg)
+                    '{{ $channel }}': {x: {!! $charts[$channel]->xAxis() !!}, s: {!! $charts[$channel]->dataSet() !!}},
+                @endforeach
             };
 
-            let smsHistoryChart = new ApexCharts(
-                document.querySelector("#sms-reports"),
-                smsHistoryChartoptions
-            );
-
-            smsHistoryChart.render();
+            Object.keys(extraCharts).forEach(function (key) {
+                const el = document.querySelector('#' + key + '_sms_data');
+                if (!el) return; // channel not enabled for this account
+                new ApexCharts(el, createChartOptions(240, extraCharts[key].x, extraCharts[key].s)).render();
+            });
 
         });
 

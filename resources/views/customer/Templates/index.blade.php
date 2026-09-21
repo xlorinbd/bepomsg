@@ -14,12 +14,12 @@
 @section('content')
 
     <!-- Basic table -->
-    <section id="datatables-basic">
-        <div class="mb-3 mt-2">
+    <section id="datatables-basic" class="bm-page">
+        <div class="bm-row">
             @can('sms_template')
                 <div class="btn-group">
                     <button
-                            class="btn btn-primary fw-bold dropdown-toggle"
+                            class="bm-btn dropdown-toggle"
                             type="button"
                             id="bulk_actions"
                             data-bs-toggle="dropdown"
@@ -41,16 +41,15 @@
             @can('sms_template')
                 <div class="btn-group">
                     <a href="{{route('customer.templates.create')}}"
-                       class="btn btn-success waves-light waves-effect fw-bold mx-1"> {{__('locale.buttons.add_new')}}
-                        <i data-feather="plus-circle"></i></a>
+                       class="bm-btn bm-btn--primary">+ {{__('locale.buttons.add_new')}}</a>
                 </div>
             @endcan
 
         </div>
-        <div class="row">
-            <div class="col-12">
-                <div class="card">
-                    <table class="table datatables-basic">
+        <div class="bm-card bm-card--flush bm-dt">
+<div>
+<div>
+<table class="table datatables-basic">
                         <thead>
                         <tr>
                             <th></th>

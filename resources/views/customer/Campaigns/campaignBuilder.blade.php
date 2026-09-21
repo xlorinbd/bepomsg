@@ -37,19 +37,28 @@
 @section('content')
 
     <!-- Basic Vertical form layout section start -->
-    <section id="basic-vertical-layouts campaign_builder">
-        <div class="row match-height">
-            <div class="col-md-8 col-12">
-                <div class="card">
-                    <div class="card-content">
-                        <div class="card-body">
+    <section id="basic-vertical-layouts campaign_builder" class="bm-page">
 
-                            <form id="campaign-builder-form" class="form form-vertical"
-                                  action="{{ route('customer.sms.campaign_builder') }}"
-                                  method="post">
-                                @csrf
-                                <div class="row">
+        {{-- Stepper: Recipients → Message → Schedule → Review (client-side sections of ONE form) --}}
+        <div class="bm-stepper" id="bmStepper">
+            @foreach([1 => 'recipients', 2 => 'message', 3 => 'schedule', 4 => 'review'] as $n => $key)
+                <button type="button" class="bm-step {{ $n === 1 ? 'is-active' : '' }}" data-step="{{ $n }}">
+                    <span class="bm-step__num">{{ $n }}</span>{{ __('portal.step_' . $key) }}
+                </button>
+            @endforeach
+        </div>
 
+        <form id="campaign-builder-form" class="form form-vertical bm-form"
+              action="{{ route('customer.sms.campaign_builder') }}"
+              method="post">
+            @csrf
+
+            <div class="bm-page">
+
+                {{-- Step 1 · Recipients --}}
+                <div data-step-panel="1" class="bm-grid bm-grid--split" style="--bm-cols: minmax(0, 1.5fr) minmax(0, 1fr);">
+                    <div class="bm-card" style="padding: 18px;">
+                        <div class="row">
                                     <div class="col-12">
                                         <div class="mb-1">
                                             <label for="name"
@@ -211,7 +220,23 @@
                                             @enderror
                                         </div>
                                     </div>
+                        </div>
+                    </div>
 
+                    <div class="bm-card" style="padding: 18px;">
+                        <span class="bm-card__title">{{ __('portal.final_recipients') }}</span>
+                        <div class="bm-card" style="background: var(--bm-bg); box-shadow: none; padding: 14px; gap: 4px;">
+                            <span class="bm-stat__label">{{ __('portal.final_recipients') }}</span>
+                            <span class="bm-mono" id="bmFinalCount" style="font-size: 24px; font-weight: 700;">0</span>
+                        </div>
+                        <span class="bm-muted" style="font-size: 12px; line-height: 1.6;">{{ __('portal.recipients_note') }}</span>
+                    </div>
+                </div>
+
+                {{-- Step 2 · Message --}}
+                <div data-step-panel="2" class="bm-grid bm-grid--split" style="--bm-cols: minmax(0, 1.6fr) minmax(0, 1fr); display: none;">
+                    <div class="bm-card" style="padding: 18px;">
+                        <div class="row">
                                     <div class="col-md-6 col-12">
                                         <div class="mb-1">
                                             <label class="sms_template form-label"
@@ -280,8 +305,23 @@
                                             @enderror
                                         </div>
                                     </div>
+                        </div>
+                    </div>
 
+                    <div class="bm-card" style="padding: 18px;">
+                        <span class="bm-card__title">{{ __('portal.preview') }}</span>
+                        <div class="bm-phone">
+                            <div class="bm-phone__time bm-time">--:--</div>
+                            <div class="bm-phone__bubble bmPreviewText" data-placeholder="{{ __('portal.preview_placeholder') }}">{{ __('portal.preview_placeholder') }}</div>
+                            <div class="bm-phone__from bmPreviewFrom"></div>
+                        </div>
+                    </div>
+                </div>
 
+                {{-- Step 3 · Schedule --}}
+                <div data-step-panel="3" style="display: none;">
+                    <div class="bm-card" style="padding: 18px;">
+                        <div class="row">
                                     <div class="col-12">
                                         <div class="mb-1">
                                             <div class="form-check form-check-inline">
@@ -298,9 +338,7 @@
                                             </p>
                                         </div>
                                     </div>
-
-                                </div>
-
+                        </div>
                                 <div class="row schedule_time">
                                     <div class="col-md-6">
                                         <div class="mb-1">
@@ -414,8 +452,6 @@
                                         </div>
                                     </div>
                                 </div>
-
-
                                 <div class="row">
                                     <div class="col-12">
                                         <div class="mb-1">
@@ -428,7 +464,6 @@
                                         </div>
                                     </div>
                                 </div>
-
                                 <div class="row advanced_div">
                                     <div class="col-12">
                                         <div class="mb-1">
@@ -452,36 +487,48 @@
                                         </div>
                                     </div>
                                 </div>
+                    </div>
+                </div>
 
-
-                                <div class="d-flex justify-content-between">
-                                    <div class="d-none d-sm-block">
-                                        <button type="button" id="phoneMessagePreview"
-                                                class="btn btn-info mr-1 mt-1 mb-1"><i data-feather="smartphone"></i>
-                                            {{ __('locale.buttons.preview') }}
-                                        </button>
-                                    </div>
-                                    <div class="">
-                                        <input type="hidden" value="plain" name="sms_type" id="sms_type">
-                                        <input type="hidden" value="{{ $plan_id }}" name="plan_id">
-                                        <button type="button" id="sendMessagePreview" class="btn btn-primary mt-1 mb-1">
-                                            <i data-feather="send"></i>
-                                            {{ __('locale.buttons.send') }}
-                                        </button>
-                                    </div>
-                                </div>
-
-                            </form>
+                {{-- Step 4 · Review --}}
+                <div data-step-panel="4" class="bm-grid bm-grid--split" style="--bm-cols: minmax(0, 1.4fr) minmax(0, 1fr); display: none;">
+                    <div class="bm-card" style="padding: 18px;">
+                        <span class="bm-card__title">{{ __('portal.step_review') }}</span>
+                        <div class="d-flex flex-column" style="gap: 10px;">
+                            <div class="bm-kv"><span>{{ __('locale.campaigns.campaign_reference') }}</span><span class="bm-trunc" id="rvName">—</span></div>
+                            <div class="bm-kv"><span>{{ __('locale.labels.sender_id') }}</span><span class="bm-trunc" id="rvSender">—</span></div>
+                            <div class="bm-kv"><span>{{ __('locale.contacts.contact_groups') }}</span><span class="bm-trunc" id="rvGroups">—</span></div>
+                            <div class="bm-kv"><span>{{ __('portal.final_recipients') }}</span><span class="bm-mono" id="rvRecipients">0</span></div>
+                            <div class="bm-kv"><span>{{ __('portal.sms_per_recipient') }}</span><span class="bm-mono" id="rvParts">1</span></div>
+                            <div class="bm-kv"><span>{{ __('portal.step_schedule') }}</span><span id="rvSchedule">—</span></div>
+                            <div class="bm-kv bm-kv--total"><span>{{ __('portal.total_cost') }}</span><span class="bm-mono" id="rvCost">0</span></div>
+                        </div>
+                    </div>
+                    <div class="bm-card" style="padding: 18px;">
+                        <span class="bm-card__title">{{ __('portal.preview') }}</span>
+                        <div class="bm-phone">
+                            <div class="bm-phone__time bm-time">--:--</div>
+                            <div class="bm-phone__bubble bmPreviewText" data-placeholder="{{ __('portal.preview_placeholder') }}">{{ __('portal.preview_placeholder') }}</div>
+                            <div class="bm-phone__from bmPreviewFrom"></div>
                         </div>
                     </div>
                 </div>
+
+                <div class="bm-row" style="justify-content: flex-end;">
+                    <input type="hidden" value="plain" name="sms_type" id="sms_type">
+                    <input type="hidden" value="{{ $plan_id }}" name="plan_id">
+                    <button type="button" id="bmPrev" class="bm-btn bm-btn--lg" style="display: none;">{{ __('portal.back') }}</button>
+                    <button type="button" id="bmNext" class="bm-btn bm-btn--primary bm-btn--lg"></button>
+                    <button type="button" id="sendMessagePreview" class="bm-btn bm-btn--primary bm-btn--lg" style="display: none;">
+                        <i data-feather="send"></i>
+                        {{ __('locale.buttons.send') }}
+                    </button>
+                </div>
+
             </div>
-        </div>
+        </form>
     </section>
     <!-- // Basic Vertical form layout section end -->
-
-    <!-- Mobile Preview Modal -->
-    @include('customer.Campaigns._mobilePreviewModal')
 
     <!-- message preview Modal -->
     @include('customer.Campaigns._messagePreviewModal')
@@ -847,6 +894,85 @@ let schedule = $(".schedule"),
           $("#phonePreview").modal("show");
         });
 
+        // ---- Stepper: Recipients → Message → Schedule → Review ----
+        const stepLabels = {
+          1: @json(__('portal.step_recipients')),
+          2: @json(__('portal.step_message')),
+          3: @json(__('portal.step_schedule')),
+          4: @json(__('portal.step_review'))
+        };
+        let currentStep = 1;
+
+        function refreshReview() {
+          const parts = Number($messages.text()) || 1;
+          const total = Number($("#bmFinalCount").text().replace(/[^0-9]/g, "")) || 0;
+          const groups = $("#contact_groups option:selected").map(function() {
+            return $.trim($(this).text()).replace(/\s*\([^)]*\)\s*$/, "");
+          }).get().join(", ");
+          const msg = $get_msg.val();
+          const $bubble = $(".bmPreviewText");
+          $bubble.text(msg.length ? msg : $bubble.first().data("placeholder"));
+          $(".bmPreviewFrom").text($("#sender_id").val() || "");
+          $("#rvName").text($("#name").val() || "—");
+          $("#rvSender").text($("#sender_id").val() || "—");
+          $("#rvGroups").text(groups || "—");
+          $("#rvRecipients").text(total.toLocaleString());
+          $("#rvParts").text(parts);
+          $("#rvCost").text((total * parts).toLocaleString());
+          $("#rvSchedule").text($(".schedule").prop("checked")
+            ? ($("#schedule_date").val() + " " + $("#time").val())
+            : @json(__('portal.send_now')));
+        }
+
+        function goStep(n) {
+          currentStep = n;
+          $("[data-step-panel]").hide().filter("[data-step-panel='" + n + "']").show();
+          $(".bm-step").removeClass("is-active").filter("[data-step='" + n + "']").addClass("is-active");
+          $("#bmPrev").toggle(n > 1);
+          $("#bmNext").toggle(n < 4).text(n < 4 ? @json(__('portal.next')) + ": " + stepLabels[n + 1] : "");
+          $("#sendMessagePreview").toggle(n === 4);
+          if (n === 2 || n === 4) {
+            refreshReview();
+          }
+        }
+
+        $(".bm-step").on("click", function() {
+          goStep(Number($(this).data("step")));
+        });
+        $("#bmNext").on("click", function() {
+          goStep(Math.min(4, currentStep + 1));
+        });
+        $("#bmPrev").on("click", function() {
+          goStep(Math.max(1, currentStep - 1));
+        });
+
+        // Live final-recipient count for the selected groups
+        $("#contact_groups").on("change", function() {
+          const ids = $(this).val() || [];
+          if (!ids.length) {
+            $("#bmFinalCount").text("0");
+            return;
+          }
+          $.ajax({
+            url: "{{ route('customer.contacts.count_contact') }}",
+            type: "POST",
+            data: {_token: "{{ csrf_token() }}", contact_group_ids: ids},
+            cache: false,
+            success: function(data) {
+              $("#bmFinalCount").text(Number(data).toLocaleString());
+            }
+          });
+        });
+
+        $get_msg.on("change keyup paste", refreshReview);
+        $("#sms_template").on("change", function() {
+          setTimeout(refreshReview, 600);
+        });
+
+        // Land on the step that holds the first server-side validation error
+        const invalidPanel = firstInvalid.closest("[data-step-panel]");
+        goStep(invalidPanel.length ? Number(invalidPanel.data("step-panel")) : 1);
+
         //Make mobile preview time lively
         setInterval(function() {
           let date = new Date();
@@ -856,6 +982,7 @@ let schedule = $(".schedule"),
           $(".top-section-time").html(
             hours + ":" + minutes + ":" + seconds
           );
+          $(".bm-time").text(hours + ":" + minutes);
         }, 500);
 
       });

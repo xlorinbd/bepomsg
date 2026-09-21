@@ -57,6 +57,18 @@
                     </div>
 
 
+                    @php
+                        $bmIsCustomerPortal = Auth::user()->active_portal == 'customer' && Auth::user()->is_customer == 1 && Auth::user()->customer->activeSubscription();
+                        $bmLanguages = \App\Helpers\Helper::languages();
+                        $bmLocale = app()->getLocale();
+                        $bmCodes = collect($bmLanguages)->pluck('code');
+                        $bmHasPill = $bmCodes->contains('bn') && $bmCodes->contains('en');
+                        $bmPillLanguages = collect($bmLanguages)->whereIn('code', ['bn', 'en'])->sortByDesc('code')->values()->all();
+                        $bmOtherLanguages = collect($bmLanguages)->whereNotIn('code', ['bn', 'en'])->values()->all();
+                    @endphp
+
+                    <span class="bm-topbar-title ms-1 d-none d-md-inline">@yield('title')</span>
+
                     <ul class="nav navbar-nav align-items-center ms-auto">
 
                         @if(Auth::user()->active_portal == 'admin' && Auth::user()->is_admin == 1)
@@ -74,7 +86,19 @@
                             </li>
                         @endif
 
-                        {{--Language Dropdown--}}
+                        {{--Language: বাং/EN segmented pill when both are enabled; other languages stay in the dropdown--}}
+                        @if($bmHasPill)
+                            <li class="nav-item me-1">
+                                <div class="bm-lang">
+                                    @foreach($bmPillLanguages as $lang)
+                                        <a href="{{ url('lang/'.$lang['code']) }}"
+                                           class="{{ $bmLocale === $lang['code'] ? 'is-active' : '' }}"
+                                           data-language="{{ $lang['code'] }}">{{ $lang['code'] === 'bn' ? 'বাং' : strtoupper($lang['code']) }}</a>
+                                    @endforeach
+                                </div>
+                            </li>
+                        @endif
+                        @if(!$bmHasPill || count($bmOtherLanguages) > 0)
                         <li class="nav-item dropdown dropdown-language">
                             <a class="nav-link dropdown-toggle" id="dropdown-flag" href="#" data-bs-toggle="dropdown"
                                aria-haspopup="true">
@@ -82,7 +106,7 @@
                                 <span class="selected-language">English</span>
                             </a>
                             <div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdown-flag">
-                                @foreach(\App\Helpers\Helper::languages() as $lang)
+                                @foreach($bmHasPill ? $bmOtherLanguages : $bmLanguages as $lang)
                                     <a class="dropdown-item" href="{{url('lang/'.$lang['code'])}}"
                                        data-language="{{$lang['code']}}">
                                         <i class="flag-icon flag-icon-{{$lang['iso_code']}}"></i> {{ $lang['name'] }}
@@ -91,6 +115,7 @@
 
                             </div>
                         </li>
+                        @endif
 
                         {{--Dark and light option. It will be theme manager option--}}
                         {{--                        <li class="nav-item d-none d-lg-block">--}}
@@ -290,19 +315,20 @@
                         </li>
 
 
-                        @if(Auth::user()->active_portal == 'customer' && Auth::user()->is_customer == 1 && Auth::user()->customer->activeSubscription())
-                            <li class="nav-item balance-top-up">
-                                <div class="show-balance">
-                                    <span class="show-balance-text text-uppercase">SMS Balance</span>
-                                    <span class="show-balance-unit">{{ number_format(Auth::user()->sms_balance) }}</span>
-                                </div>
-                                <a class="nav-link top-up-url d-sm-block" href="{{ route('customer.buy_sms.index') }}">
-                                    <button type="button" class="btn btn-sm btn-outline-success">
-                                        <span class="font-weight-bold"
-                                              style="font-size: 12px">Buy SMS</span>
-                                    </button>
+                        @if($bmIsCustomerPortal)
+                            {{-- Live credit balance chip + primary CTA --}}
+                            <li class="nav-item d-none d-sm-block mx-1">
+                                <a class="bm-credit-chip" href="{{ route('customer.buy_sms.index') }}"
+                                   title="{{ __('locale.menu.Buy SMS') }}">
+                                    <span class="bm-mono">{{ number_format(Auth::user()->sms_balance) }}</span>
+                                    <span class="bm-credit-unit">{{ __('portal.credits') }}</span>
                                 </a>
                             </li>
+                            @can('sms_campaign_builder')
+                                <li class="nav-item d-none d-md-block me-1">
+                                    <a class="bm-cta" href="{{ route('customer.sms.campaign_builder') }}">{{ __('portal.new_campaign') }}</a>
+                                </li>
+                            @endcan
                         @endif
 
 

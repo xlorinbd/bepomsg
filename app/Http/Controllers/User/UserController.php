@@ -3,7 +3,9 @@
     namespace App\Http\Controllers\User;
 
     use App\Http\Controllers\Controller;
+    use App\Models\Campaigns;
     use App\Models\Reports;
+    use App\Models\Senderid;
     use App\Repositories\Contracts\UserRepository;
     use ArielMejiaDev\LarapexCharts\LarapexChart;
     use Carbon\Carbon;
@@ -144,7 +146,35 @@
                 ->get();
 
 
-            return view('customer.dashboard', compact('breadcrumbs', 'sms_history', 'userAnnouncements', 'total_sms_sent', 'deliveredCount', 'undeliveredCount', 'charts'));
+            // Last 7 days, Plain vs Unicode (dashboard "SMS Statistics" bars)
+            $weekStart = Carbon::today()->subDays(6);
+            $weekRows  = Reports::where('user_id', Auth::user()->id)
+                ->whereIn('sms_type', ['plain', 'unicode'])
+                ->where('created_at', '>=', $weekStart)
+                ->select(
+                    DB::raw('DATE(created_at) as d'),
+                    DB::raw('SUM(CASE WHEN sms_type = "plain" THEN 1 ELSE 0 END) as plain_count'),
+                    DB::raw('SUM(CASE WHEN sms_type = "unicode" THEN 1 ELSE 0 END) as unicode_count'),
+                )
+                ->groupBy(DB::raw('DATE(created_at)'))
+                ->get()
+                ->keyBy('d');
+
+            $weekStats = collect(range(0, 6))->map(function ($i) use ($weekStart, $weekRows) {
+                $date = $weekStart->copy()->addDays($i);
+                $row  = $weekRows->get($date->toDateString());
+
+                return [
+                    'label'   => $date->format($i === 0 || $i === 6 ? 'j M' : 'j'),
+                    'plain'   => (int) ($row->plain_count ?? 0),
+                    'unicode' => (int) ($row->unicode_count ?? 0),
+                ];
+            });
+
+            $recentCampaigns = Campaigns::where('user_id', Auth::user()->id)->latest()->take(5)->get();
+            $senderIds       = Senderid::where('user_id', Auth::user()->id)->latest()->take(5)->get();
+
+            return view('customer.dashboard', compact('breadcrumbs', 'sms_history', 'userAnnouncements', 'total_sms_sent', 'deliveredCount', 'undeliveredCount', 'charts', 'weekStats', 'recentCampaigns', 'senderIds'));
         }
 
         public function createLineChart($title, $subtitle, $data)

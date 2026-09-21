@@ -1,49 +1,16 @@
 @if($contact->cache)
-    <div class="row match-height">
-
-        <div class="col-lg-4 col-sm-6 col-12">
-            <div class="card">
-                <div class="card-header">
-                    <div>
-                        <h2 class="fw-bolder mb-0">{{ $contact->readCache('TotalSubscribers') }}</h2>
-                        <p class="card-text">{{ __('locale.labels.total') }}</p>
-                    </div>
-
-                    <div>
-                        <i class="font-large-3 text-primary" data-feather="users"></i>
-                    </div>
-                </div>
-            </div>
+    <div class="bm-grid bm-grid--stats" style="margin-bottom: 16px;">
+        <div class="bm-stat">
+            <span class="bm-stat__label">{{ __('locale.labels.total') }}</span>
+            <span class="bm-stat__value">{{ $contact->readCache('TotalSubscribers') }}</span>
         </div>
-
-        <div class="col-lg-4 col-sm-6 col-12">
-            <div class="card">
-                <div class="card-header">
-                    <div>
-                        <h2 class="fw-bolder mb-0">{{ $contact->readCache('SubscribersCount') }}</h2>
-                        <p class="card-text">{{ __('locale.contacts.active_contacts') }}</p>
-                    </div>
-
-                    <div>
-                        <i class="font-large-3 text-success" data-feather="user-check"></i>
-                    </div>
-                </div>
-            </div>
+        <div class="bm-stat">
+            <span class="bm-stat__label">{{ __('locale.contacts.active_contacts') }}</span>
+            <span class="bm-stat__value bm-stat__value--ok">{{ $contact->readCache('SubscribersCount') }}</span>
         </div>
-
-        <div class="col-lg-4 col-sm-6 col-12">
-            <div class="card">
-                <div class="card-header">
-                    <div>
-                        <h2 class="fw-bolder mb-0">{{ $contact->readCache('UnsubscribesCount') }}</h2>
-                        <p class="card-text">{{ __('locale.contacts.inactive_contacts') }}</p>
-                    </div>
-                    <div>
-                        <i class="font-large-3 text-danger" data-feather="user-x"></i>
-                    </div>
-
-                </div>
-            </div>
+        <div class="bm-stat">
+            <span class="bm-stat__label">{{ __('locale.contacts.inactive_contacts') }}</span>
+            <span class="bm-stat__value bm-stat__value--bad">{{ $contact->readCache('UnsubscribesCount') }}</span>
         </div>
     </div>
 @endif
@@ -51,11 +18,11 @@
 
 <div id="datatables-basic">
 
-    <div class="mb-3 mt-2">
+    <div class="bm-row" style="margin-bottom: 16px;">
         @can('view_contact')
             <div class="btn-group">
                 <button
-                        class="btn btn-primary fw-bold dropdown-toggle me-1"
+                        class="bm-btn dropdown-toggle"
                         type="button"
                         id="bulk_actions"
                         data-bs-toggle="dropdown"
@@ -83,28 +50,25 @@
         @can('create_contact')
             <div class="btn-group">
                 <a href="{{route('customer.contact.create', $contact->uid)}}"
-                   class="btn btn-success waves-light waves-effect fw-bold me-1"> {{__('locale.buttons.add_new')}} <i
-                            data-feather="plus-circle"></i></a>
+                   class="bm-btn bm-btn--primary"> + {{__('locale.buttons.add_new')}}</a>
             </div>
         @endcan
 
         @can('view_contact')
             <div class="btn-group">
                 <a href="{{ route('customer.contact.import', $contact->uid) }}"
-                   class="btn btn-secondary waves-light waves-effect fw-bold me-1"> {{__('locale.buttons.import')}} <i
-                            data-feather="upload"></i></a>
+                   class="bm-btn"> {{__('locale.buttons.import')}}</a>
             </div>
 
-            <div class="btn-group  me-1">
+            <div class="btn-group">
                 <button id="export-contact"
-                        class="btn btn-info waves-light waves-effect fw-bold"> {{__('locale.buttons.export')}} <i
-                            data-feather="download"></i></button>
+                        class="bm-btn"> {{__('locale.buttons.export')}}</button>
             </div>
 
 
             <div class="btn-group">
                 <button
-                        class="btn btn-outline-primary fw-bold dropdown-toggle"
+                        class="bm-btn dropdown-toggle"
                         type="button"
                         id="columns"
                         data-bs-toggle="dropdown"
@@ -134,9 +98,9 @@
     <div>
     </div>
 
-    <div class="row">
-        <div class="col-12">
-            <div class="card">
+    <div class="bm-card bm-card--flush bm-dt">
+        <div>
+            <div>
                 <table class="table datatables-basic">
                     <thead>
                     <tr>

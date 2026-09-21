@@ -88,5 +88,22 @@
             {{-- Foreach menu item ends --}}
         </ul>
     </div>
+
+    {{-- User card: avatar, name, verification state, logout --}}
+    <div class="bm-user-card">
+        <span class="bm-avatar">
+            <img src="{{ route('user.avatar', Auth::user()->uid) }}" alt="{{ Auth::user()->displayName() }}">
+        </span>
+        <span class="bm-user-meta">
+            <strong>{{ Auth::user()->displayName() }}</strong>
+            @if(Auth::user()->active_portal == 'admin')
+                <small>{{ __('portal.administrator') }}</small>
+            @else
+                <small>{{ __('portal.business') }} · {{ Auth::user()->isVerified() ? __('portal.verified') : __('portal.unverified') }}</small>
+            @endif
+        </span>
+        <a class="bm-logout" href="{{ route('logout') }}"
+           onclick="event.preventDefault(); document.getElementById('logout-form').submit();">{{ __('locale.menu.Logout') }}</a>
+    </div>
 </div>
 <!-- END: Main Menu-->

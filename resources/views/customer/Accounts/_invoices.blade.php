@@ -1,6 +1,6 @@
-<div class="row">
-    <div class="col-12">
-        <div class="card">
+<div class="bm-card bm-card--flush bm-dt">
+    <div>
+        <div>
             <table class="table datatables-basic">
                 <thead>
                 <tr>

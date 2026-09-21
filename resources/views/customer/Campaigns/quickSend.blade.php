@@ -28,31 +28,22 @@
 
 @section('content')
 
-  <!-- Basic Vertical form layout section start -->
-  <section id="basic-vertical-layouts campaign_builder">
+  <section id="basic-vertical-layouts campaign_builder" class="bm-page">
 
-
-    <div class="row">
-      <div class="col-md-8 col-12">
-        <div class="alert alert-info" role="alert">
-          <div class="alert-body d-flex align-items-center">
-            <i data-feather="info" class="me-50"></i>
-            <span class="text-uppercase"> {{ __('locale.template_tags.not_work_with_quick_send')  }}</span>
-          </div>
-        </div>
+    <div class="alert alert-info mb-0" role="alert">
+      <div class="alert-body d-flex align-items-center">
+        <i data-feather="info" class="me-50"></i>
+        <span class="text-uppercase"> {{ __('locale.template_tags.not_work_with_quick_send')  }}</span>
       </div>
     </div>
 
+    <div class="bm-grid bm-grid--split" style="--bm-cols: minmax(0, 1.6fr) minmax(0, 1fr);">
+      <div class="d-flex flex-column" style="gap: 16px; min-width: 0;">
 
-    <div class="row match-height">
-      <div class="col-md-8 col-12">
-        <div class="card">
-          <div class="card-content">
-            <div class="card-body">
-
-              <form id="form-send" class="form form-vertical" action="{{ route('customer.sms.quick_send') }}"
-                method="post">
-                @csrf
+        <div class="bm-card" style="padding: 18px;">
+          <form id="form-send" class="form form-vertical bm-form" action="{{ route('customer.sms.quick_send') }}"
+            method="post">
+            @csrf
                 <div class="row">
 
                   @if($sendingServers->count() > 0)
@@ -292,32 +283,50 @@
 
                 </div>
 
-                <div class="d-flex justify-content-between">
-                  <div class="d-none d-sm-block">
-                    <button type="button" id="phoneMessagePreview" class="btn btn-info mr-1 mb-1"><i
-                        data-feather="smartphone"></i> {{ __('locale.buttons.preview') }}
-                    </button>
-                  </div>
-                  <div class="">
-                    <input type="hidden" value="plain" name="sms_type" id="sms_type">
-                    <button type="button" id="sendMessagePreview" class="btn btn-primary mr-1 mb-1"><i
-                        data-feather="send"></i>
-                      {{ __('locale.buttons.send') }}</button>
-                  </div>
+                <div class="bm-row" style="margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--bm-line-soft);">
+                  <input type="hidden" value="plain" name="sms_type" id="sms_type">
+                  <button type="button" id="sendMessagePreview" class="bm-btn bm-btn--primary bm-btn--lg"><i
+                      data-feather="send"></i> {{ __('locale.buttons.send') }}</button>
+                  @can('sms_campaign_builder')
+                    <a class="bm-btn bm-btn--lg" href="{{ route('customer.sms.campaign_builder') }}">{{ __('portal.schedule') }}</a>
+                  @endcan
+                  <span class="bm-muted ms-auto" style="font-size: 13px;">{{ __('portal.estimated_cost') }}
+                    <span class="bm-mono" style="color: var(--bm-ink); font-weight: 600;" id="bmEstCost">0</span>
+                    {{ __('portal.credits') }}</span>
                 </div>
 
-              </form>
-            </div>
+          </form>
+        </div>
+
+        <div class="bm-card">
+          <span class="bm-card__title">{{ __('portal.unicode_count') }}</span>
+          <div class="bm-row" style="gap: 24px; font-size: 13px;">
+            <span class="bm-muted">{{ __('portal.gsm7') }}: <b style="color: var(--bm-ink);">{{ __('portal.chars_per_sms', ['count' => 160]) }}</b></span>
+            <span class="bm-muted">{{ __('portal.unicode') }}: <b style="color: var(--bm-ink);">{{ __('portal.chars_per_sms', ['count' => 70]) }}</b></span>
+            <span class="bm-muted">{{ __('portal.multipart_unicode') }}: <b style="color: var(--bm-ink);">{{ __('portal.chars_per_part', ['count' => 67]) }}</b></span>
           </div>
+        </div>
+
+      </div>
+
+      {{-- Live preview --}}
+      <div class="bm-card" style="padding: 18px;">
+        <span class="bm-card__title">{{ __('portal.preview') }}</span>
+        <div class="bm-phone">
+          <div class="bm-phone__time bm-time">--:--</div>
+          <div class="bm-phone__bubble" id="bmPreviewText" data-placeholder="{{ __('portal.preview_placeholder') }}">{{ __('portal.preview_placeholder') }}</div>
+          <div class="bm-phone__from" id="bmPreviewFrom"></div>
+        </div>
+        <div class="d-flex flex-column" style="gap: 8px;">
+          <div class="bm-kv"><span>{{ __('locale.labels.recipients') }}</span><span class="bm-mono" id="bmSumRecipients">0</span></div>
+          <div class="bm-kv"><span>{{ __('portal.sms_per_recipient') }}</span><span class="bm-mono" id="bmSumParts">1</span></div>
+          <div class="bm-kv bm-kv--total"><span>{{ __('portal.total_cost') }}</span><span class="bm-mono" id="bmSumCost">0</span></div>
         </div>
       </div>
     </div>
   </section>
   <!-- // Basic Vertical form layout section end -->
 
-
-  <!-- Mobile Preview Modal -->
-  @include('customer.Campaigns._mobilePreviewModal')
 
   <!-- message preview Modal -->
   @include('customer.Campaigns._messagePreviewModal')
@@ -393,6 +402,21 @@
         return pattern.test(text);
       }
 
+      // Live preview + cost summary (right-hand panel and estimated cost)
+      function refresh_summary() {
+        const parts = Number($messages.text()) || 1;
+        const total = Number($(".number_of_recipients").first().text()) || 0;
+        const msg = $get_msg.val();
+        const $bubble = $("#bmPreviewText");
+        $bubble.text(msg.length ? msg : $bubble.data("placeholder"));
+        $("#bmSumRecipients").text(total.toLocaleString());
+        $("#bmSumParts").text(parts);
+        $("#bmSumCost, #bmEstCost").text((total * parts).toLocaleString());
+        $("#bmPreviewFrom").text($("#sender_id").val() || $("#sender_id_custom").val() || "");
+      }
+
+      $("#sender_id, #sender_id_custom").on("change", refresh_summary);
+
       function get_character() {
         if ($get_msg[0].value !== null) {
 
@@ -414,6 +438,7 @@
           $encoding.text(data.encoding);
 
         }
+        refresh_summary();
 
       }
 
@@ -516,6 +541,7 @@
         let total = number_of_recipients_manual + Number(number_of_recipients_ajax);
 
         $(".number_of_recipients").text(total);
+        refresh_summary();
         return total;
       }
 
@@ -581,6 +607,7 @@
         $(".top-section-time").html(
           hours + ":" + minutes + ":" + seconds
         );
+        $(".bm-time").text(hours + ":" + minutes);
       }, 500);
     });
   </script>

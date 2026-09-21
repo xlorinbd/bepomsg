@@ -43,23 +43,5 @@
 @endif
 
 @include('panels/_brand_dynamic_style')
-
-<style>
-    @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+Bengali:wght@300;400;500;600;700&display=swap');
-
-    html[lang="bn"] body,
-    html[lang="bn"] h1,
-    html[lang="bn"] h2,
-    html[lang="bn"] h3,
-    html[lang="bn"] h4,
-    html[lang="bn"] h5,
-    html[lang="bn"] h6,
-    html[lang="bn"] .h1,
-    html[lang="bn"] .h2,
-    html[lang="bn"] .h3,
-    html[lang="bn"] .h4,
-    html[lang="bn"] .h5,
-    html[lang="bn"] .h6 {
-        font-family: 'Noto Serif Bengali', serif !important;
-    }
-</style>
+{{-- Fonts: IBM Plex Sans (Latin) + Hind Siliguri (Bangla) + JetBrains Mono are
+     loaded in layouts/contentLayoutMaster and applied via --bm-font in overrides.scss. --}}

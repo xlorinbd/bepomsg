@@ -33,9 +33,33 @@
 
 @section('content')
 
-    <section id="nav-justified">
-        <div class="row">
-            <div class="col-12">
+    <section id="nav-justified" class="bm-page">
+        <div class="bm-grid bm-grid--split" style="--bm-cols: minmax(0, 240px) minmax(0, 1fr);">
+
+            {{-- Groups sidebar --}}
+            <div class="bm-card" style="padding: 14px; gap: 4px;">
+                <div class="bm-sidelist">
+                    <div class="bm-sidelist__label">{{ __('locale.contacts.contact_groups') }}</div>
+                    <a class="bm-sidelist__item" href="{{ route('customer.contacts.index') }}">
+                        <span>{{ __('locale.menu.Contacts') }}</span>
+                    </a>
+                    <a class="bm-sidelist__item is-active" href="{{ route('customer.contacts.show', $contact->uid) }}">
+                        <span class="bm-trunc">{{ $contact->name }}</span>
+                        <span class="bm-mono">{{ $contact->readCache('SubscribersCount', 0) }}</span>
+                    </a>
+                    @foreach($contact_groups as $bmGroup)
+                        <a class="bm-sidelist__item" href="{{ route('customer.contacts.show', $bmGroup->uid) }}">
+                            <span class="bm-trunc">{{ $bmGroup->name }}</span>
+                        </a>
+                    @endforeach
+                    @can('create_contact_group')
+                        <a class="bm-btn bm-btn--dashed bm-btn--block" style="margin-top: 8px;"
+                           href="{{ route('customer.contacts.create') }}">+ {{ __('locale.buttons.add_new') }}</a>
+                    @endcan
+                </div>
+            </div>
+
+            <div style="min-width: 0;">
 
                 <ul class="nav nav-pills mb-2 text-uppercase" role="tablist">
 

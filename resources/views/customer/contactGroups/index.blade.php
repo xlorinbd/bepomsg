@@ -14,60 +14,50 @@
 @section('content')
 
     <!-- Basic table -->
-    <section id="datatables-basic">
-        <div class="mb-3 mt-2">
-            @can('view_contact_group')
-                <div class="btn-group">
-                    <button
-                            class="btn btn-primary fw-bold dropdown-toggle"
-                            type="button"
-                            id="bulk_actions"
-                            data-bs-toggle="dropdown"
-                            aria-expanded="false"
-                    >
-                        {{ __('locale.labels.actions') }}
-                    </button>
-                    <div class="dropdown-menu" aria-labelledby="bulk_actions">
-                        <a class="dropdown-item bulk-enable" href="#"><i data-feather="check"></i> {{ __('locale.datatables.bulk_enable') }}</a>
-                        <a class="dropdown-item bulk-disable" href="#"><i data-feather="stop-circle"></i> {{ __('locale.datatables.bulk_disable') }}</a>
-                        <a class="dropdown-item bulk-delete" href="#"><i data-feather="trash"></i> {{ __('locale.datatables.bulk_delete') }}</a>
+    <section id="datatables-basic" class="bm-page">
+        <div class="bm-row bm-row--between">
+            <div class="bm-row">
+                @can('view_contact_group')
+                    <div class="btn-group">
+                        <button class="bm-btn dropdown-toggle" type="button" id="bulk_actions"
+                                data-bs-toggle="dropdown" aria-expanded="false">
+                            {{ __('locale.labels.actions') }}
+                        </button>
+                        <div class="dropdown-menu" aria-labelledby="bulk_actions">
+                            <a class="dropdown-item bulk-enable" href="#"><i data-feather="check"></i> {{ __('locale.datatables.bulk_enable') }}</a>
+                            <a class="dropdown-item bulk-disable" href="#"><i data-feather="stop-circle"></i> {{ __('locale.datatables.bulk_disable') }}</a>
+                            <a class="dropdown-item bulk-delete" href="#"><i data-feather="trash"></i> {{ __('locale.datatables.bulk_delete') }}</a>
+                        </div>
                     </div>
-                </div>
-            @endcan
-
-            @can('create_contact_group')
-                <div class="btn-group">
-                    <a href="{{route('customer.contacts.create')}}" class="btn btn-success waves-light waves-effect fw-bold mx-1"> {{__('locale.buttons.add_new')}} <i data-feather="plus-circle"></i></a>
-                </div>
-            @endcan
-
-            @can('view_contact_group')
-                <div class="btn-group">
-                    <a href="{{route('customer.contacts.export')}}" class="btn btn-info waves-light waves-effect fw-bold"> {{__('locale.buttons.export')}} <i data-feather="file-text"></i></a>
-                </div>
-            @endcan
-
-        </div>
-        <div class="row">
-            <div class="col-12">
-                <div class="card">
-                    <table class="table datatables-basic">
-                        <thead>
-                        <tr>
-                            <th></th>
-                            <th></th>
-                            <th>{{ __('locale.labels.id') }}</th>
-                            <th>{{__('locale.labels.name')}} </th>
-                            <th>{{__('locale.menu.Contacts')}}</th>
-                            <th>{{__('locale.labels.last_import_date')}}</th>
-                            <th>{{__('locale.labels.created_at')}}</th>
-                            <th>{{__('locale.labels.status')}}</th>
-                            <th>{{__('locale.labels.actions')}}</th>
-                        </tr>
-                        </thead>
-                    </table>
-                </div>
+                @endcan
             </div>
+
+            <div class="bm-row">
+                @can('view_contact_group')
+                    <a href="{{ route('customer.contacts.export') }}" class="bm-btn">{{ __('locale.buttons.export') }}</a>
+                @endcan
+                @can('create_contact_group')
+                    <a href="{{ route('customer.contacts.create') }}" class="bm-btn bm-btn--primary">+ {{ __('locale.buttons.add_new') }}</a>
+                @endcan
+            </div>
+        </div>
+
+        <div class="bm-card bm-card--flush bm-dt">
+            <table class="table datatables-basic">
+                <thead>
+                <tr>
+                    <th></th>
+                    <th></th>
+                    <th>{{ __('locale.labels.id') }}</th>
+                    <th>{{__('locale.labels.name')}} </th>
+                    <th>{{__('locale.menu.Contacts')}}</th>
+                    <th>{{__('locale.labels.last_import_date')}}</th>
+                    <th>{{__('locale.labels.created_at')}}</th>
+                    <th>{{__('locale.labels.status')}}</th>
+                    <th>{{__('locale.labels.actions')}}</th>
+                </tr>
+                </thead>
+            </table>
         </div>
     </section>
     <!--/ Basic table -->

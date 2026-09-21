@@ -977,6 +977,7 @@ class Helper
                 //                        ],
             ],
             'customer' => [
+                ['navheader' => 'MAIN'],
                 [
                     'url' => url('dashboard'),
                     'slug' => 'dashboard',
@@ -1223,6 +1224,7 @@ class Helper
                     'icon' => 'cpu',
                     'access' => 'automations',
                 ],
+                ['navheader' => 'INSIGHTS'],
                 [
                     'url' => '',
                     'name' => 'Reports',
@@ -1256,6 +1258,7 @@ class Helper
                         ],
                     ],
                 ],
+                ['navheader' => 'ACCOUNT'],
                 [
                     'url' => '#',
                     'name' => 'Billing',

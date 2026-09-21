@@ -11,20 +11,21 @@
 @section('content')
 
     <!-- Basic Vertical form layout section start -->
-    <section id="basic-vertical-layouts">
-        <div class="row match-height">
-            <div class="col-md-6 col-12">
-                <div class="card">
-                    <div class="card-header">
-                        <h4 class="card-title">{{ __('locale.labels.request_for_new_one') }} </h4>
-                    </div>
-                    <div class="card-content">
-                        <div class="card-body">
+    <section id="basic-vertical-layouts" class="bm-page">
+        <div class="bm-grid bm-grid--split" style="--bm-cols: minmax(0, 1fr) minmax(0, 1fr);">
+            <div class="bm-card" style="padding: 18px;">
+                <div class="bm-row bm-row--between">
+                    <span class="bm-card__title">{{ __('locale.labels.request_for_new_one') }}</span>
+                    <a class="bm-link" href="{{ route('customer.senderid.index') }}">{{ __('locale.menu.Sender ID') }} →</a>
+                </div>
+                <div>
+                    <div>
+                        <div>
                             @if(config('app.trai_dlt') && Auth::user()->customer->activeSubscription() !== null && Auth::user()->customer->activeSubscription()->plan->is_dlt)
                                 <p><code>{!!  __('locale.sender_id.dlt_description') !!}</code></p>
                             @endif
 
-                            <form class="form form-vertical" action="{{ route('customer.senderid.store') }}"
+                            <form class="form form-vertical bm-form" action="{{ route('customer.senderid.store') }}"
                                   method="post" enctype="multipart/form-data">
                                 @csrf
                                 <div class="form-body">
@@ -121,9 +122,10 @@
                                     <div class="row mt-2">
                                         <div class="col-12">
                                             <input type="hidden" value="{{Auth::user()->id}}" name="user_id">
-                                            <button type="submit" class="btn btn-primary mb-1"><i
+                                            <button type="submit" class="bm-btn bm-btn--primary bm-btn--block"><i
                                                         data-feather="send"></i> {{ __('locale.buttons.send') }}
                                             </button>
+                                            <p class="bm-muted mt-1 mb-0" style="font-size: 12px; line-height: 1.6;">{{ __('portal.sender_approval_note') }}</p>
                                         </div>
                                     </div>
                                 </div>

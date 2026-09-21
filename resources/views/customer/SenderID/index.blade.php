@@ -14,12 +14,12 @@
 @section('content')
 
     <!-- Basic table -->
-    <section id="datatables-basic">
-        <div class="mb-3 mt-2">
+    <section id="datatables-basic" class="bm-page">
+        <div class="bm-row">
             @can('delete_sender_id')
                 <div class="btn-group">
                     <button
-                            class="btn btn-primary fw-bold dropdown-toggle"
+                            class="bm-btn dropdown-toggle"
                             type="button"
                             id="bulk_actions"
                             data-bs-toggle="dropdown"
@@ -36,16 +36,16 @@
             @if($sender_id_plan > 0)
                 @can('create_sender_id')
                     <div class="btn-group">
-                        <a href="{{route('customer.senderid.request')}}" class="btn btn-success waves-light waves-effect fw-bold mx-1"> {{__('locale.labels.request_for_new_one')}} <i data-feather="plus-circle"></i></a>
+                        <a href="{{route('customer.senderid.request')}}" class="bm-btn bm-btn--primary">+ {{__('locale.labels.request_for_new_one')}}</a>
                     </div>
                 @endcan
             @endif
 
         </div>
-        <div class="row">
-            <div class="col-12">
-                <div class="card">
-                    <table class="table datatables-basic">
+        <div class="bm-card bm-card--flush bm-dt">
+<div>
+<div>
+<table class="table datatables-basic">
                         <thead>
                         <tr>
                             <th></th>

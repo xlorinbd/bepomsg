@@ -1,0 +1,1413 @@
+// =====================================================================
+// BepoMSG customer portal — design handoff layer.
+// Reusable `.bm-*` components + shell (sidebar / topbar) sizing.
+// Flat, hairline-bordered, single indigo accent. Tokens come from the
+// :root block in overrides.scss (brand color is re-pointed at runtime
+// by panels/_brand_dynamic_style.blade.php).
+// =====================================================================
+
+$bm-menu-w: 236px;
+$bm-bar-h: 60px;
+$bm-user-card-h: 63px;
+
+:root {
+    --bm-bg: #fafafa;
+    --bm-ink-2: #52525b;
+    --bm-line-soft: #f4f4f5;
+    --bm-line-strong: #d4d4d8;
+    --bm-primary-tint: #eef2ff;
+    --bm-ok: #047857;
+    --bm-ok-bg: #ecfdf5;
+    --bm-warn: #b45309;
+    --bm-warn-bg: #fffbeb;
+    --bm-bad: #b91c1c;
+    --bm-bad-bg: #fef2f2;
+    --bm-mute: #52525b;
+    --bm-mute-bg: #f4f4f5;
+    --bm-info: #4338ca;
+    --bm-info-bg: #eef2ff;
+    --bm-font: 'IBM Plex Sans', 'Hind Siliguri', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --bm-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+// ---- Typography: IBM Plex Sans (Latin) + Hind Siliguri (Bangla). ----
+html:not(.dark-layout) body {
+    background-color: var(--bm-bg);
+}
+
+html body,
+html body .header-navbar,
+html body .btn,
+html body .form-control,
+html body .form-select,
+html body .dropdown-menu,
+html body .modal-content,
+html body h1, html body h2, html body h3, html body h4, html body h5, html body h6,
+html body .h1, html body .h2, html body .h3, html body .h4, html body .h5, html body .h6 {
+    font-family: var(--bm-font);
+}
+
+// ---- Shell: flat 60px topbar + 236px sidebar. ----
+.header-navbar-shadow {
+    display: none !important;
+}
+
+// Flat white bar even when the saved theme sets a navbar color (bg-primary etc.)
+.header-navbar.header-navbar.header-navbar {
+    background: var(--bm-surface) !important;
+    color: var(--bm-ink);
+}
+
+// Vuexy forces white text on colored navbars; keep ink text on the white bar.
+.header-navbar.header-navbar[class*='bg-'] .navbar-nav .nav-item > a {
+    &,
+    i,
+    span,
+    svg {
+        color: var(--bm-ink) !important;
+    }
+
+    &.bm-cta,
+    &.bm-cta span {
+        color: #fff !important;
+    }
+
+    .bm-credit-unit {
+        color: var(--bm-ink-soft) !important;
+    }
+}
+
+.header-navbar.header-navbar[class*='bg-'] .bm-lang a {
+    color: var(--bm-ink-2) !important;
+
+    &.is-active {
+        color: #fff !important;
+    }
+}
+
+.header-navbar .navbar-container .bookmark-wrapper {
+    flex: 0 0 auto;
+}
+
+// The topbar carries the page title; the old title/breadcrumb block is redundant.
+html body:not(.blank-page) .content-header {
+    display: none;
+}
+
+.header-navbar.floating-nav,
+.header-navbar.navbar-static-top,
+.header-navbar.fixed-top {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    width: auto;
+    margin: 0;
+    height: $bm-bar-h;
+    min-height: $bm-bar-h;
+    padding: 0;
+    border-radius: 0 !important;
+    border-bottom: 1px solid var(--bm-border);
+
+    .navbar-container:not(.main-menu-content) {
+        height: 100%;
+        padding: 0 22px !important;
+        align-items: center;
+    }
+}
+
+html body:not(.blank-page) .content.app-content {
+    padding: calc(#{$bm-bar-h} + 22px) 22px 0;
+}
+
+@media (min-width: 1200px) {
+    .header-navbar.floating-nav,
+    .header-navbar.navbar-static-top,
+    .header-navbar.fixed-top {
+        left: $bm-menu-w;
+    }
+
+    .vertical-layout.vertical-menu-modern.menu-collapsed .header-navbar.floating-nav,
+    .vertical-layout.vertical-menu-modern.menu-collapsed .header-navbar.navbar-static-top,
+    .vertical-layout.vertical-menu-modern.menu-collapsed .header-navbar.fixed-top {
+        left: 80px;
+        width: auto;
+    }
+
+    html body:not(.blank-page) .content {
+        margin-left: $bm-menu-w;
+    }
+
+    .vertical-layout.vertical-menu-modern .main-menu,
+    .vertical-layout.vertical-menu-modern.menu-expanded .main-menu {
+        width: $bm-menu-w;
+    }
+
+    .vertical-layout.vertical-menu-modern.menu-expanded .footer {
+        margin-left: $bm-menu-w;
+    }
+}
+
+// ---- Sidebar internals: wordmark row, section labels, user card. ----
+.main-menu {
+    .navbar-header {
+        height: $bm-bar-h;
+        padding: 0 18px;
+        display: flex;
+        align-items: center;
+        width: 100%;
+
+        .navbar-brand {
+            margin: 0;
+            padding: 0;
+        }
+
+        > .navbar-nav {
+            width: 100%;
+            flex-wrap: nowrap;
+            align-items: center;
+        }
+
+        .nav-toggle .nav-link {
+            padding: 0;
+        }
+
+        .brand-logo img {
+            height: 24px;
+            width: auto;
+            max-width: none !important;
+            display: block;
+        }
+    }
+
+    .shadow-bottom {
+        display: none !important;
+    }
+
+    .main-menu-content {
+        height: calc(100% - #{$bm-bar-h} - #{$bm-user-card-h}) !important;
+    }
+
+    .navigation {
+        .navigation-header {
+            margin: 0;
+            padding: 12px 10px 6px;
+            opacity: 1;
+
+            > i,
+            > svg {
+                display: none;
+            }
+        }
+
+        > li > a {
+            padding: 9px 10px;
+            font-size: 14px;
+        }
+    }
+
+    // Submenu (expanded group): flat rows, no filled active state
+    .navigation .menu-content {
+        > li {
+            box-shadow: none !important;
+            background: transparent !important;
+
+            > a {
+                padding: 8px 10px 8px 34px;
+                border-radius: 6px !important;
+                font-size: 13px;
+                color: var(--bm-ink-soft) !important;
+                box-shadow: none !important;
+                background: transparent !important;
+
+                i,
+                svg {
+                    color: var(--bm-ink-soft) !important;
+                }
+            }
+
+            &:hover > a {
+                background: var(--bm-surface-soft) !important;
+                color: var(--bm-ink) !important;
+            }
+
+            &.active > a {
+                background: var(--bm-surface-soft) !important;
+                color: var(--bm-primary) !important;
+                font-weight: 600;
+
+                i,
+                svg {
+                    color: var(--bm-primary) !important;
+                }
+            }
+        }
+    }
+
+    .bm-user-card {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: $bm-user-card-h;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 0 14px;
+        border-top: 1px solid var(--bm-border);
+        background: var(--bm-surface);
+
+        .bm-avatar {
+            width: 30px;
+            height: 30px;
+            flex: none;
+            border-radius: 50%;
+            background: var(--bm-border);
+            overflow: hidden;
+
+            img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+        }
+
+        .bm-user-meta {
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+            line-height: 1.3;
+
+            strong {
+                font-size: 13px;
+                font-weight: 600;
+                color: var(--bm-ink);
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
+            small {
+                font-size: 11px;
+                color: var(--bm-ink-soft);
+            }
+        }
+
+        .bm-logout {
+            margin-left: auto;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--bm-ink-soft) !important;
+            cursor: pointer;
+
+            &:hover {
+                color: var(--bm-ink) !important;
+            }
+        }
+    }
+}
+
+// ---- Topbar: title, language pill, credit chip, CTA. ----
+.bm-topbar-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--bm-ink);
+    white-space: nowrap;
+}
+
+.bm-lang {
+    display: flex;
+    border: 1px solid var(--bm-border);
+    border-radius: 6px;
+    overflow: hidden;
+
+    a {
+        padding: 5px 10px;
+        font-size: 12px;
+        font-weight: 600;
+        line-height: 1.4;
+        color: var(--bm-ink-2) !important;
+
+        &.is-active {
+            background: var(--bm-ink);
+            color: #fff !important;
+        }
+    }
+}
+
+.bm-credit-chip {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 5px 11px;
+    border: 1px solid var(--bm-border);
+    border-radius: 9999px;
+    font-size: 13px;
+    color: var(--bm-ink) !important;
+
+    &::before {
+        content: '';
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: #10b981;
+    }
+
+    .bm-mono {
+        font-weight: 500;
+    }
+
+    .bm-credit-unit {
+        color: var(--bm-ink-soft);
+    }
+}
+
+.bm-cta {
+    padding: 7px 14px;
+    border-radius: 6px;
+    background: var(--bm-primary);
+    color: #fff !important;
+    font-size: 13px;
+    font-weight: 600;
+    white-space: nowrap;
+
+    &:hover {
+        background: var(--bm-primary-dark);
+    }
+}
+
+// =====================================================================
+// Page components
+// =====================================================================
+.bm-mono {
+    font-family: var(--bm-mono);
+}
+
+.bm-muted {
+    color: var(--bm-ink-soft);
+}
+
+.bm-trunc {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
+}
+
+.bm-page {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.bm-page-title {
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin: 0;
+}
+
+.bm-page-sub {
+    font-size: 13px;
+    color: var(--bm-ink-soft);
+    margin-top: 3px;
+}
+
+.bm-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.bm-row--between {
+    justify-content: space-between;
+}
+
+.bm-grid {
+    display: grid;
+    gap: 14px;
+}
+
+.bm-grid--stats {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+}
+
+.bm-grid--stats-sm {
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+
+.bm-grid--cards {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+}
+
+.bm-grid--split {
+    gap: 16px;
+    align-items: start;
+    grid-template-columns: minmax(0, 1fr);
+
+    @media (min-width: 992px) {
+        grid-template-columns: var(--bm-cols, minmax(0, 1fr) minmax(0, 1fr));
+    }
+}
+
+.bm-span-2 {
+    @media (min-width: 992px) {
+        grid-column: span 2;
+    }
+}
+
+// ---- Card ----
+.bm-card {
+    background: var(--bm-surface);
+    border: 1px solid var(--bm-border);
+    border-radius: var(--bm-radius);
+    padding: 16px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    min-width: 0;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+
+    &--flush {
+        padding: 0;
+        gap: 0;
+        overflow: hidden;
+    }
+
+    &--dashed {
+        background: var(--bm-bg);
+        border-style: dashed;
+        border-color: var(--bm-line-strong);
+        box-shadow: none;
+    }
+
+    &--accent {
+        border-color: var(--bm-primary);
+    }
+}
+
+.bm-card__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    flex-wrap: wrap;
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--bm-border);
+}
+
+.bm-card__title {
+    font-size: 14px;
+    font-weight: 600;
+    margin: 0;
+    color: var(--bm-ink);
+}
+
+.bm-card__foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 18px;
+    font-size: 13px;
+    color: var(--bm-ink-soft);
+}
+
+// ---- Stat tile ----
+.bm-stat {
+    @extend .bm-card;
+    gap: 6px;
+    padding: 16px;
+
+    &__label {
+        font-size: 12px;
+        color: var(--bm-ink-soft);
+    }
+
+    &__value {
+        font-family: var(--bm-mono);
+        font-size: 26px;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        line-height: 1.2;
+        color: var(--bm-ink);
+
+        &--ok { color: var(--bm-ok); }
+        &--bad { color: var(--bm-bad); }
+    }
+
+    &__sub {
+        font-size: 12px;
+        color: var(--bm-ink-soft);
+
+        &--link { color: var(--bm-primary) !important; font-weight: 600; }
+        &--ok { color: #059669; font-weight: 600; }
+        &--bad { color: var(--bm-bad); font-weight: 600; }
+        &--warn { color: var(--bm-warn); font-weight: 600; }
+    }
+
+    &--lg {
+        padding: 18px;
+
+        .bm-stat__value { font-size: 30px; }
+    }
+}
+
+// ---- Pill / status badge ----
+.bm-pill {
+    display: inline-block;
+    justify-self: start;
+    padding: 3px 8px;
+    border-radius: 9999px;
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1.4;
+    background: var(--bm-mute-bg);
+    color: var(--bm-mute);
+    white-space: nowrap;
+
+    &--ok { background: var(--bm-ok-bg); color: var(--bm-ok); }
+    &--warn { background: var(--bm-warn-bg); color: var(--bm-warn); }
+    &--bad { background: var(--bm-bad-bg); color: var(--bm-bad); }
+    &--info { background: var(--bm-info-bg); color: var(--bm-info); }
+}
+
+.bm-method {
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-family: var(--bm-mono);
+    font-size: 11px;
+    font-weight: 700;
+    background: var(--bm-ok-bg);
+    color: var(--bm-ok);
+
+    &--get { background: var(--bm-info-bg); color: var(--bm-info); }
+}
+
+// ---- Grid table. Set columns via --bm-cols. Cells truncate so long
+// ---- phone numbers / names never break row height. ----
+.bm-tbl {
+    font-size: 13px;
+
+    &__head,
+    &__row {
+        display: grid;
+        grid-template-columns: var(--bm-cols, repeat(4, minmax(0, 1fr)));
+        align-items: center;
+        column-gap: 10px;
+        padding: 12px 18px;
+        border-bottom: 1px solid var(--bm-line-soft);
+
+        > * {
+            min-width: 0;
+        }
+    }
+
+    &__head {
+        padding-top: 9px;
+        padding-bottom: 9px;
+        background: var(--bm-bg);
+        border-bottom-color: var(--bm-border);
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.04em;
+        color: var(--bm-ink-soft);
+        text-transform: uppercase;
+    }
+
+    &__row:last-child {
+        border-bottom: 0;
+    }
+
+    &__row > span:not(.bm-pill),
+    &__row > a {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+}
+
+// ---- Buttons (design-exact; Bootstrap .btn stays for legacy screens) ----
+.bm-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 7px 14px;
+    border: 1px solid var(--bm-border);
+    border-radius: 6px;
+    background: var(--bm-surface);
+    color: var(--bm-ink) !important;
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.4;
+    cursor: pointer;
+    transition: background-color 0.15s ease, border-color 0.15s ease;
+
+    &:hover {
+        background: var(--bm-line-soft);
+    }
+
+    &--primary {
+        background: var(--bm-primary);
+        border-color: var(--bm-primary);
+        color: #fff !important;
+
+        &:hover {
+            background: var(--bm-primary-dark);
+            border-color: var(--bm-primary-dark);
+        }
+    }
+
+    &--soft {
+        background: var(--bm-line-soft);
+        border-color: var(--bm-line-soft);
+    }
+
+    &--dashed {
+        border-style: dashed;
+        border-color: var(--bm-line-strong);
+        color: var(--bm-ink-2) !important;
+    }
+
+    &--block {
+        display: flex;
+        width: 100%;
+    }
+
+    &--lg {
+        padding: 9px 18px;
+    }
+}
+
+.bm-link {
+    color: var(--bm-primary) !important;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+// ---- Form fields ----
+.bm-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+
+    > label,
+    &__label {
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--bm-ink-2);
+        margin: 0;
+    }
+
+    .form-control,
+    .form-select {
+        min-height: 38px;
+        font-size: 14px;
+    }
+
+    textarea.form-control {
+        line-height: 1.7;
+    }
+}
+
+.bm-field__row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.bm-chip {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 10px;
+    border-radius: 9999px;
+    background: var(--bm-line-soft);
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.bm-chips {
+    min-height: 70px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    align-content: flex-start;
+    padding: 10px;
+    border: 1px solid var(--bm-border);
+    border-radius: 6px;
+}
+
+.bm-drop {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 56px;
+    padding: 10px;
+    border: 1px dashed var(--bm-line-strong);
+    border-radius: 6px;
+    font-size: 13px;
+    color: var(--bm-ink-soft);
+    text-align: center;
+}
+
+// ---- Toggle row / pill switch ----
+.bm-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 10px 12px;
+    border: 1px solid var(--bm-border);
+    border-radius: 8px;
+    font-size: 13px;
+
+    &--plain {
+        padding: 0;
+        border: 0;
+    }
+
+    .form-check-input {
+        width: 34px;
+        height: 20px;
+        margin: 0;
+        cursor: pointer;
+    }
+}
+
+// ---- Selectable option row (group checklist) ----
+.bm-option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 11px 12px;
+    border: 1px solid var(--bm-border);
+    border-radius: 8px;
+    font-size: 14px;
+    cursor: pointer;
+
+    &.is-selected {
+        border-color: var(--bm-primary);
+        background: var(--bm-primary-tint);
+        font-weight: 500;
+    }
+
+    &__count {
+        margin-left: auto;
+        font-family: var(--bm-mono);
+        font-size: 12px;
+        color: var(--bm-ink-2);
+    }
+}
+
+// ---- Filter pills (templates) ----
+.bm-filter {
+    padding: 6px 12px;
+    border: 1px solid var(--bm-border);
+    border-radius: 9999px;
+    font-size: 13px;
+    color: var(--bm-ink-2) !important;
+    background: var(--bm-surface);
+    cursor: pointer;
+
+    &.is-active {
+        background: var(--bm-ink);
+        border-color: var(--bm-ink);
+        color: #fff !important;
+        font-weight: 600;
+    }
+}
+
+// ---- Stepper (campaign builder) ----
+.bm-stepper {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 16px 18px;
+    background: var(--bm-surface);
+    border: 1px solid var(--bm-border);
+    border-radius: var(--bm-radius);
+}
+
+.bm-step {
+    flex: 1;
+    background: transparent;
+    font-family: inherit;
+    text-align: left;
+    min-width: 150px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border: 1px solid var(--bm-border);
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--bm-ink-2);
+
+    &__num {
+        width: 22px;
+        height: 22px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        background: var(--bm-line-soft);
+        color: var(--bm-ink-2);
+        font-size: 12px;
+    }
+
+    &.is-active {
+        border-color: var(--bm-primary);
+        background: var(--bm-primary-tint);
+        color: var(--bm-info);
+
+        .bm-step__num {
+            background: var(--bm-primary);
+            color: #fff;
+        }
+    }
+}
+
+// ---- Sidebar list (contact groups) ----
+.bm-sidelist {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+
+    &__label {
+        padding: 6px 8px 10px;
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.06em;
+        color: var(--bm-ink-soft);
+    }
+
+    &__item {
+        display: flex;
+        justify-content: space-between;
+        gap: 8px;
+        padding: 9px 10px;
+        border-radius: 6px;
+        font-size: 14px;
+        color: var(--bm-ink-2) !important;
+
+        .bm-mono {
+            font-size: 12px;
+            color: var(--bm-ink-soft);
+        }
+
+        &:hover {
+            background: var(--bm-line-soft);
+        }
+
+        &.is-active {
+            background: var(--bm-line-soft);
+            font-weight: 600;
+            color: var(--bm-primary) !important;
+        }
+    }
+}
+
+// ---- SMS bubble preview ----
+.bm-phone {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 16px;
+    border-radius: 14px;
+    background: var(--bm-line-soft);
+
+    &__time {
+        position: static !important;
+        font-size: 11px;
+        color: var(--bm-ink-soft);
+        text-align: center;
+    }
+
+    &__bubble {
+        align-self: flex-start;
+        max-width: 92%;
+        padding: 12px 14px;
+        border: 1px solid var(--bm-border);
+        border-radius: 14px 14px 14px 4px;
+        background: var(--bm-surface);
+        font-size: 14px;
+        line-height: 1.7;
+        white-space: pre-wrap;
+        word-break: break-word;
+    }
+
+    &__from {
+        align-self: flex-start;
+        font-size: 11px;
+        color: var(--bm-ink-soft);
+    }
+}
+
+.bm-kv {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    font-size: 13px;
+
+    > span:first-child {
+        color: var(--bm-ink-soft);
+    }
+
+    &--total {
+        padding-top: 8px;
+        border-top: 1px solid var(--bm-line-soft);
+        font-weight: 600;
+
+        > span:first-child {
+            color: var(--bm-ink);
+        }
+    }
+}
+
+// ---- Bar chart (dashboard, pure CSS) ----
+.bm-legend {
+    display: flex;
+    gap: 14px;
+    font-size: 12px;
+    color: var(--bm-ink-soft);
+
+    i {
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        margin-right: 6px;
+        border-radius: 2px;
+    }
+}
+
+.bm-bars {
+    height: 168px;
+    display: flex;
+    align-items: flex-end;
+    gap: 10px;
+
+    &__col {
+        flex: 1;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        gap: 3px;
+    }
+
+    &__bar {
+        background: var(--bm-primary);
+        border-radius: 0 0 3px 3px;
+
+        &--uni {
+            background: #c7d2fe;
+            border-radius: 3px 3px 0 0;
+        }
+    }
+}
+
+.bm-bars-axis {
+    display: flex;
+    justify-content: space-between;
+    font-family: var(--bm-mono);
+    font-size: 11px;
+    color: var(--bm-ink-soft);
+}
+
+// ---- Code panel (API docs) ----
+.bm-code {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    min-width: 0;
+    padding: 18px;
+    border-radius: var(--bm-radius);
+    background: #18181b;
+
+    &__tabs {
+        display: flex;
+        gap: 8px;
+    }
+
+    &__tab {
+        padding: 5px 12px;
+        border: 0;
+        border-radius: 6px;
+        background: transparent;
+        color: #a1a1aa;
+        font-size: 12px;
+        font-weight: 600;
+
+        &.is-active {
+            background: #27272a;
+            color: #fff;
+        }
+    }
+
+    pre {
+        margin: 0;
+        padding: 0;
+        background: transparent;
+        font-family: var(--bm-mono);
+        font-size: 12.5px;
+        line-height: 1.8;
+        color: #e4e4e7;
+        white-space: pre-wrap;
+        word-break: break-word;
+
+        &.is-response {
+            color: #86efac;
+        }
+    }
+
+    hr {
+        margin: 0;
+        border: 0;
+        height: 1px;
+        background: #27272a;
+        opacity: 1;
+    }
+
+    &__label {
+        font-size: 12px;
+        color: #a1a1aa;
+    }
+}
+
+.bm-keybox {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border: 1px solid var(--bm-border);
+    border-radius: 6px;
+    background: var(--bm-bg);
+    font-family: var(--bm-mono);
+    font-size: 13px;
+    overflow: hidden;
+
+    > span:first-child {
+        flex: 1;
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+}
+
+.bm-endpoint {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 0;
+    border-bottom: 1px solid var(--bm-line-soft);
+    font-family: var(--bm-mono);
+    font-size: 13px;
+
+    &:last-child {
+        border-bottom: 0;
+    }
+}
+
+// ---- Template card ----
+.bm-tpl {
+    @extend .bm-card;
+    gap: 10px;
+    padding: 16px;
+    min-height: 170px;
+
+    &__body {
+        font-size: 13px;
+        line-height: 1.7;
+        color: #3f3f46;
+    }
+
+    &__meta {
+        margin-top: auto;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 12px;
+        color: var(--bm-ink-soft);
+    }
+}
+
+// ---- Login split screen ----
+.bm-login {
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    background: var(--bm-surface);
+
+    @media (min-width: 992px) {
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    }
+
+    &__form {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 40px;
+    }
+
+    &__inner {
+        width: 100%;
+        max-width: 360px;
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+    }
+
+    &__logo {
+        align-self: flex-start;
+        height: 28px;
+        width: auto;
+    }
+
+    &__title {
+        margin: 0;
+        font-size: 24px;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+    }
+
+    &__panel {
+        display: none;
+        flex-direction: column;
+        justify-content: center;
+        gap: 22px;
+        padding: 48px;
+        background: #18181b;
+
+        @media (min-width: 992px) {
+            display: flex;
+        }
+
+        h2 {
+            max-width: 420px;
+            margin: 0;
+            color: #fafafa;
+            font-size: 26px;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            line-height: 1.4;
+        }
+
+        p {
+            max-width: 420px;
+            margin: 0;
+            color: #d4d4d8;
+            font-size: 14px;
+            line-height: 1.8;
+        }
+    }
+
+    &__stats {
+        display: flex;
+        gap: 28px;
+        padding-top: 8px;
+
+        div {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        strong {
+            color: #fff;
+            font-family: var(--bm-mono);
+            font-size: 22px;
+            font-weight: 700;
+        }
+
+        span {
+            color: #a1a1aa;
+            font-size: 12px;
+        }
+    }
+}
+
+// ---- Bootstrap forms inside redesigned screens: design typography. ----
+.bm-form {
+    .form-label,
+    label.form-label {
+        margin-bottom: 6px;
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--bm-ink-2);
+    }
+
+    .form-control,
+    .form-select {
+        min-height: 38px;
+        font-size: 14px;
+    }
+
+    textarea.form-control {
+        line-height: 1.7;
+    }
+
+    .row {
+        row-gap: 16px;
+    }
+
+    .mb-1 {
+        margin-bottom: 0 !important;
+    }
+}
+
+// ---- DataTables inside a .bm-card--flush: hairline grid table, design
+// ---- pills for Bootstrap badges, truncated cells (no row-height blowups). ----
+.bm-dt {
+    .dataTables_wrapper {
+        > .row,
+        > .d-flex {
+            margin: 0;
+            padding: 12px 18px;
+        }
+    }
+
+    table.dataTable {
+        margin: 0 !important;
+        font-size: 13px;
+        border-collapse: collapse !important;
+
+        thead th {
+            padding: 9px 18px;
+            background: var(--bm-bg);
+            border-top: 0;
+            border-bottom: 1px solid var(--bm-border) !important;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.04em;
+            color: var(--bm-ink-soft);
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        tbody td {
+            padding: 12px 18px;
+            border-bottom: 1px solid var(--bm-line-soft);
+            vertical-align: middle;
+            max-width: 260px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        tbody tr:last-child td {
+            border-bottom: 0;
+        }
+
+        tbody tr:hover > td {
+            background: var(--bm-bg);
+        }
+    }
+
+    .dataTables_length,
+    .dataTables_info {
+        font-size: 13px;
+        color: var(--bm-ink-soft);
+    }
+
+    .dataTables_filter input,
+    .dataTables_length select {
+        min-height: 34px;
+        border: 1px solid var(--bm-border);
+        border-radius: 6px;
+        font-size: 13px;
+    }
+
+    .pagination {
+        gap: 6px;
+        margin: 0;
+
+        .page-link {
+            padding: 5px 10px;
+            border: 1px solid var(--bm-border);
+            border-radius: 6px !important;
+            font-size: 13px;
+            color: var(--bm-ink-2);
+        }
+
+        .page-item.active .page-link {
+            color: #fff;
+        }
+    }
+
+    // Bootstrap badges → design status pills
+    .badge {
+        padding: 3px 8px;
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: none;
+        background: var(--bm-mute-bg) !important;
+        color: var(--bm-mute) !important;
+
+        &.bg-success,
+        &.badge-light-success { background: var(--bm-ok-bg) !important; color: var(--bm-ok) !important; }
+        &.bg-warning,
+        &.badge-light-warning { background: var(--bm-warn-bg) !important; color: var(--bm-warn) !important; }
+        &.bg-danger,
+        &.badge-light-danger { background: var(--bm-bad-bg) !important; color: var(--bm-bad) !important; }
+        &.bg-primary,
+        &.bg-info,
+        &.badge-light-primary,
+        &.badge-light-info { background: var(--bm-info-bg) !important; color: var(--bm-info) !important; }
+    }
+}
+
+// Toolbar dropdown trigger that looks like a .bm-btn
+.bm-btn.dropdown-toggle::after {
+    margin-left: 4px;
+}
+
+// ---- API documentation: endpoint nav + dark code blocks ----
+#api-documentation {
+    #features {
+        .list-group-item {
+            padding: 9px 10px;
+            border: 0;
+            border-radius: 6px;
+            font-size: 14px;
+            color: var(--bm-ink-2);
+
+            &:hover {
+                background: var(--bm-line-soft);
+            }
+        }
+    }
+
+    .bm-docs {
+        pre,
+        pre[class*='language-'] {
+            margin: 12px 0;
+            padding: 16px;
+            border: 0;
+            border-radius: var(--bm-radius);
+            background: #18181b !important;
+            color: #e4e4e7;
+            font-family: var(--bm-mono);
+            font-size: 12.5px;
+            line-height: 1.8;
+            white-space: pre-wrap;
+            word-break: break-word;
+
+            code,
+            code[class*='language-'] {
+                background: transparent;
+                color: #e4e4e7;
+                font-family: var(--bm-mono);
+                text-shadow: none;
+                white-space: pre-wrap;
+            }
+        }
+
+        table {
+            font-size: 13px;
+        }
+    }
+}

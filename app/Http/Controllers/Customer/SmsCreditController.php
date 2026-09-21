@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Customer;
 
 use App\Http\Controllers\Controller;
+use App\Models\Invoices;
 use App\Models\PaymentMethods;
 use App\Models\SmsPricingTier;
 use App\Models\SmsPurchase;
@@ -34,12 +35,27 @@ class SmsCreditController extends Controller
             ['name' => 'Buy SMS'],
         ];
 
+        $monthSpend = (float) SmsPurchase::forUser($user->id)->completed()
+            ->where('created_at', '>=', now()->startOfMonth())
+            ->sum('total_price');
+
+        $outstandingInvoices = Invoices::where('user_id', $user->id)
+            ->whereIn('status', [Invoices::STATUS_UNPAID, Invoices::STATUS_PENDING])
+            ->count();
+
+        $orderCount   = SmsPurchase::where('user_id', $user->id)->count();
+        $recentOrders = SmsPurchase::where('user_id', $user->id)->latest()->take(5)->get();
+
         return view('customer.sms_credits.index', [
             'user' => $user,
             'balance' => $user->sms_balance,
             'tiers' => $tiers,
             'payment_methods' => $payment_methods,
             'breadcrumbs' => $breadcrumbs,
+            'monthSpend' => $monthSpend,
+            'outstandingInvoices' => $outstandingInvoices,
+            'orderCount' => $orderCount,
+            'recentOrders' => $recentOrders,
         ]);
     }
 

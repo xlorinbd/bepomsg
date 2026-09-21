@@ -8,37 +8,6 @@
 
 @section('page-style')
     <style>
-        /* Core-aligned Stats Cards */
-        .stat-card {
-            border: none;
-            box-shadow: 0 4px 24px 0 rgba(34, 41, 47, 0.1);
-            transition: all 0.3s ease-in-out;
-        }
-        .stat-card .card-body { padding: 1.5rem; }
-        .avatar .avatar-content i { width: 20px; height: 20px; }
-
-        /* Pricing Cards for Mobile */
-        .tier-card {
-            border: 1px solid #ebe9f1;
-            border-radius: 0.428rem;
-            margin-bottom: 1rem;
-            background-color: #fff;
-            padding: 1rem;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .tier-card:hover { border-color: #4F46E5; box-shadow: 0 4px 12px 0 rgba(115, 103, 240, 0.1); }
-        .tier-card.active { border-color: #4F46E5; background-color: #f8f7ff; }
-        
-        @media (max-width: 768px) {
-            .pricing-table-desktop { display: none; }
-            .tier-grid { display: block; }
-            .stat-card .card-body { padding: 1rem; }
-        }
-        @media (min-width: 769px) {
-            .tier-grid { display: none; }
-        }
-
         .payment-list-item {
             border: 2px solid #ebe9f1 !important;
             border-radius: 0.5rem;
@@ -54,57 +23,49 @@
 @endsection
 
 @section('content')
+    <div class="bm-page">
+
     {{-- Header --}}
-    <div class="d-flex align-items-center justify-content-between mb-2">
+    <div class="bm-row bm-row--between">
         <div>
-            <h4 class="mb-0 fw-bolder"><i data-feather="shopping-cart" class="me-50 text-primary"></i> Buy SMS Credits</h4>
-            <p class="text-muted small mb-0">Recharge your balance instantly</p>
+            <h1 class="bm-page-title">{{ __('portal.buy_credits') }}</h1>
+            <div class="bm-page-sub">{{ __('portal.buy_credits_sub') }}</div>
         </div>
-        <a href="{{ route('customer.buy_sms.history') }}" class="btn btn-sm btn-outline-secondary">
-            <i data-feather="list"></i> <span class="d-none d-sm-inline">Order History</span>
-        </a>
+        <a href="{{ route('customer.buy_sms.history') }}" class="bm-btn">{{ __('portal.order_history') }}</a>
     </div>
 
-    {{-- Stats Container (Proper Grid) --}}
-    <div class="row match-height mb-1">
-        <div class="col-lg-4 col-sm-6 col-12 mb-1">
-            <div class="card stat-card mb-0">
-                <div class="card-body d-flex align-items-center">
-                    <div class="avatar bg-light-primary p-50 me-1">
-                        <div class="avatar-content"><i data-feather="database" class="font-medium-5"></i></div>
-                    </div>
-                    <div class="my-auto">
-                        <h4 class="fw-bolder mb-0">{{ number_format($balance) }}</h4>
-                        <p class="card-text text-muted font-small-3">Current Balance</p>
-                    </div>
-                </div>
-            </div>
+    {{-- Balance / spend / outstanding --}}
+    <div class="bm-grid bm-grid--stats">
+        <div class="bm-stat bm-stat--lg">
+            <span class="bm-stat__label">{{ __('portal.current_balance') }}</span>
+            <span class="bm-stat__value">{{ number_format($balance) }}</span>
+            <span class="bm-stat__sub">{{ __('portal.orders_total', ['count' => $orderCount]) }}</span>
         </div>
-        <div class="col-lg-4 col-sm-6 col-12 mb-1">
-            <div class="card stat-card mb-0">
-                <div class="card-body d-flex align-items-center">
-                    <div class="avatar bg-light-success p-50 me-1">
-                        <div class="avatar-content"><i data-feather="trending-up" class="font-medium-5"></i></div>
-                    </div>
-                    <div class="my-auto">
-                        <h4 class="fw-bolder mb-0">{{ $tiers->count() }}</h4>
-                        <p class="card-text text-muted font-small-3">Active Tiers</p>
-                    </div>
-                </div>
-            </div>
+        <div class="bm-stat bm-stat--lg">
+            <span class="bm-stat__label">{{ __('portal.spend_this_month') }}</span>
+            <span class="bm-stat__value">৳{{ number_format($monthSpend, 2) }}</span>
+            <span class="bm-stat__sub">{{ __('portal.completed_orders') }}</span>
         </div>
-        <div class="col-lg-4 col-sm-6 col-12 mb-1">
-            <div class="card stat-card mb-0">
-                <div class="card-body d-flex align-items-center">
-                    <div class="avatar bg-light-info p-50 me-1">
-                        <div class="avatar-content"><i data-feather="shopping-bag" class="font-medium-5"></i></div>
-                    </div>
-                    <div class="my-auto">
-                        <h4 class="fw-bolder mb-0">{{ \App\Models\SmsPurchase::where('user_id', $user->id)->count() }}</h4>
-                        <p class="card-text text-muted font-small-3">Total Orders</p>
-                    </div>
-                </div>
+        <div class="bm-stat bm-stat--lg">
+            <span class="bm-stat__label">{{ __('portal.outstanding_invoices') }}</span>
+            <span class="bm-stat__value">{{ $outstandingInvoices }}</span>
+            <a class="bm-stat__sub {{ $outstandingInvoices ? 'bm-stat__sub--warn' : 'bm-stat__sub--link' }}" href="{{ route('customer.invoices.index') }}">{{ __('locale.labels.invoices') }} →</a>
+        </div>
+    </div>
+
+    {{-- Pricing tiers --}}
+    <div class="bm-grid bm-grid--stats">
+        @foreach($tiers as $tier)
+            <div class="bm-stat bm-stat--lg tier-pick-btn bm-tier" data-min="{{ $tier->min_qty }}" style="cursor: pointer;">
+                <span style="font-size: 13px; font-weight: 600;">{{ number_format($tier->min_qty) }} - {{ $tier->max_qty ? number_format($tier->max_qty) : '∞' }} SMS</span>
+                <span class="bm-mono" style="font-size: 22px; font-weight: 700;">৳{{ number_format($tier->rate, 2) }}</span>
+                <span class="bm-stat__sub">{{ __('portal.per_sms') }}</span>
+                <span class="bm-btn bm-btn--block" style="margin-top: 8px;">{{ __('portal.buy') }}</span>
             </div>
+        @endforeach
+        <div class="bm-stat bm-stat--lg bm-card--dashed">
+            <span style="font-size: 13px; font-weight: 600;">{{ __('portal.custom_volume') }}</span>
+            <span class="bm-stat__sub" style="line-height: 1.6;">{{ __('portal.custom_volume_note') }}</span>
         </div>
     </div>
 
@@ -115,45 +76,6 @@
                 <div class="card-body">
                     <h5 class="fw-bolder mb-1">Step 1: Select or Enter Quantity</h5>
                     
-                    {{-- Desktop Table --}}
-                    <div class="table-responsive pricing-table-desktop mb-2">
-                        <table class="table table-hover border">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>SMS Range</th>
-                                    <th>Rate</th>
-                                    <th class="text-end">Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach($tiers as $tier)
-                                    <tr>
-                                        <td>{{ number_format($tier->min_qty) }} - {{ $tier->max_qty ? number_format($tier->max_qty) : '∞' }} SMS</td>
-                                        <td><span class="badge badge-light-primary fs-6">৳{{ number_format($tier->rate, 2) }}</span></td>
-                                        <td class="text-end">
-                                            <button class="btn btn-sm btn-primary tier-pick-btn" data-min="{{ $tier->min_qty }}">Select</button>
-                                        </td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-
-                    {{-- Mobile Grid Cards (Hidden on Desktop) --}}
-                    <div class="tier-grid mb-2">
-                        @foreach($tiers as $tier)
-                            <div class="tier-card p-1 tier-pick-btn" data-min="{{ $tier->min_qty }}">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <div class="fw-bolder text-primary">৳{{ number_format($tier->rate, 2) }}/SMS</div>
-                                        <div class="small text-muted">{{ number_format($tier->min_qty) }} - {{ $tier->max_qty ? number_format($tier->max_qty) : '∞' }} SMS</div>
-                                    </div>
-                                    <i data-feather="chevron-right" class="text-muted"></i>
-                                </div>
-                            </div>
-                        @endforeach
-                    </div>
-
                     <div class="mb-0">
                         <label class="form-label fw-bold">Custom Quantity</label>
                         <div class="input-group input-group-lg">
@@ -168,7 +90,7 @@
 
         {{-- Summary Area --}}
         <div class="col-lg-5 col-12">
-            <div class="card bg-light-primary border-0">
+            <div class="card">
                 <div class="card-body">
                     <h5 class="fw-bolder mb-2">Step 2: Order Summary</h5>
                     
@@ -211,6 +133,32 @@
             </div>
         </div>
     </div>
+
+    {{-- Recent orders --}}
+    <div class="bm-card bm-card--flush">
+        <div class="bm-card__head">
+            <span class="bm-card__title">{{ __('portal.recent_orders') }}</span>
+            <a class="bm-link" href="{{ route('customer.buy_sms.history') }}">{{ __('portal.view_all') }}</a>
+        </div>
+        <div class="bm-tbl" style="--bm-cols: minmax(0, 1fr) minmax(0, 1.4fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr);">
+            <div class="bm-tbl__head">
+                <span>#</span><span>{{ __('locale.labels.details') }}</span><span>{{ __('locale.labels.date') }}</span><span>{{ __('locale.labels.amount') }}</span><span>{{ __('locale.labels.status') }}</span>
+            </div>
+            @forelse($recentOrders as $order)
+                <div class="bm-tbl__row">
+                    <span class="bm-mono">#{{ $order->id }}</span>
+                    <span>{{ number_format($order->sms_quantity) }} SMS</span>
+                    <span class="bm-muted">{{ $order->created_at->format('d M Y') }}</span>
+                    <span class="bm-mono">৳{{ number_format($order->total_price, 2) }}</span>
+                    <x-bm.status :value="$order->status" />
+                </div>
+            @empty
+                <div class="bm-tbl__row"><span class="bm-muted" style="grid-column: 1 / -1;">{{ __('portal.no_orders') }}</span></div>
+            @endforelse
+        </div>
+    </div>
+
+    </div>{{-- /bm-page --}}
 
     {{-- Payment Gateways Modal --}}
     <div class="modal fade" id="paymentGatewaysModal" tabindex="-1" aria-hidden="true">
@@ -315,6 +263,8 @@
 
             // Tier select button
             $('.tier-pick-btn').on('click', function () {
+                $('.bm-tier').removeClass('bm-card--accent');
+                $(this).addClass('bm-card--accent');
                 $('#sms-quantity').val($(this).data('min')).trigger('input');
             });
 
