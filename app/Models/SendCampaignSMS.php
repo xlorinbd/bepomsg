@@ -82,11 +82,11 @@
                 $username_value = $cg_info->username_value;
                 $password_value = null;
 
-                if ($cg_info->authorization == 'no_auth') {
+                if ($cg_info->authorization == 'no_auth' && !empty($username_param)) {
                     $send_custom_data[$username_param] = $username_value;
                 }
 
-                if ($cg_info->password_status) {
+                if ($cg_info->password_status && !empty($cg_info->password_param)) {
                     $password_param = $cg_info->password_param;
                     $password_value = $cg_info->password_value;
 
@@ -95,69 +95,54 @@
                     }
                 }
 
-                if ($cg_info->action_status) {
-                    $action_param = $cg_info->action_param;
-                    $action_value = $cg_info->action_value;
-
-                    $send_custom_data[$action_param] = $action_value;
+                if (!empty($cg_info->action_param)) {
+                    $send_custom_data[$cg_info->action_param] = $cg_info->action_value ?? 'text';
                 }
 
-                if ($cg_info->source_status) {
+                if (!empty($cg_info->source_param)) {
                     $source_param = $cg_info->source_param;
                     $source_value = $cg_info->source_value;
 
-                    if ($data['sender_id'] != '') {
+                    if (!empty($data['sender_id'])) {
                         $send_custom_data[$source_param] = $data['sender_id'];
-                    } else {
+                    } elseif (!empty($source_value)) {
                         $send_custom_data[$source_param] = $source_value;
                     }
                 }
 
-                $destination_param                    = $cg_info->destination_param;
+                $destination_param                    = $cg_info->destination_param ?: 'number';
                 $send_custom_data[$destination_param] = $data['phone'];
 
-                $message_param                    = $cg_info->message_param;
-                $send_custom_data[$message_param] = $data['message'];
+                $message_param                    = $cg_info->message_param ?: 'message';
+                $send_custom_data[$message_param] = $data['message'] ?? '';
 
-                if ($cg_info->unicode_status && $data['sms_type'] == 'unicode') {
-                    $unicode_param                    = $cg_info->unicode_param;
-                    $unicode_value                    = $cg_info->unicode_value;
-                    $send_custom_data[$unicode_param] = $unicode_value;
+                $isUnicode = ($data['sms_type'] ?? '') == 'unicode' || (!empty($data['message']) && strlen($data['message']) != mb_strlen($data['message'], 'utf-8'));
+                if ($isUnicode) {
+                    if (!empty($cg_info->unicode_param)) {
+                        $send_custom_data[$cg_info->unicode_param] = $cg_info->unicode_value ?: 'unicode';
+                    } elseif (!empty($cg_info->action_param) && $cg_info->action_param == 'type') {
+                        $send_custom_data['type'] = 'unicode';
+                    }
                 }
 
-                if ($cg_info->route_status) {
-                    $route_param = $cg_info->route_param;
-                    $route_value = $cg_info->route_value;
-
-                    $send_custom_data[$route_param] = $route_value;
+                if ($cg_info->route_status && !empty($cg_info->route_param)) {
+                    $send_custom_data[$cg_info->route_param] = $cg_info->route_value;
                 }
 
-                if ($cg_info->language_status) {
-                    $language_param = $cg_info->language_param;
-                    $language_value = $cg_info->language_value;
-
-                    $send_custom_data[$language_param] = $language_value;
+                if ($cg_info->language_status && !empty($cg_info->language_param)) {
+                    $send_custom_data[$cg_info->language_param] = $cg_info->language_value;
                 }
 
-                if ($cg_info->custom_one_status) {
-                    $custom_one_param = $cg_info->custom_one_param;
-                    $custom_one_value = $cg_info->custom_one_value;
-
-                    $send_custom_data[$custom_one_param] = $custom_one_value;
+                if ($cg_info->custom_one_status && !empty($cg_info->custom_one_param)) {
+                    $send_custom_data[$cg_info->custom_one_param] = $cg_info->custom_one_value;
                 }
 
-                if ($cg_info->custom_two_status) {
-                    $custom_two_param = $cg_info->custom_two_param;
-                    $custom_two_value = $cg_info->custom_two_value;
-
-                    $send_custom_data[$custom_two_param] = $custom_two_value;
+                if ($cg_info->custom_two_status && !empty($cg_info->custom_two_param)) {
+                    $send_custom_data[$cg_info->custom_two_param] = $cg_info->custom_two_value;
                 }
 
-                if ($cg_info->custom_three_status) {
-                    $custom_three_param = $cg_info->custom_three_param;
-                    $custom_three_value = $cg_info->custom_three_value;
-
-                    $send_custom_data[$custom_three_param] = $custom_three_value;
+                if ($cg_info->custom_three_status && !empty($cg_info->custom_three_param)) {
+                    $send_custom_data[$cg_info->custom_three_param] = $cg_info->custom_three_value;
                 }
 
                 //if json encoded then encode custom data json_encode($send_custom_data) otherwise do http_build_query
@@ -230,14 +215,39 @@
                 $keywordMatched = false;
 
                 if ($curlErrNo) {
+                    $customer_status = 'Failed';
                     $get_sms_status = trim($curlError) . " [DebugRef:$debugRef]";
                 } else {
-                    if (substr_count(strtolower($get_sms_status), strtolower($sending_server->success_keyword)) == 1) {
+                    $respStr = trim((string) $get_sms_status);
+                    $decoded = json_decode($respStr, true);
+                    $successKey = !empty($sending_server->success_keyword) ? strtolower(trim($sending_server->success_keyword)) : '202';
+
+                    $isSuccess = false;
+                    if (is_array($decoded)) {
+                        $respCode = isset($decoded['response_code']) ? (int) $decoded['response_code'] : null;
+                        if (in_array($respCode, [200, 202, 1000])) {
+                            $isSuccess = true;
+                        } elseif (!empty($decoded['success_message']) && empty($decoded['error_message'])) {
+                            $isSuccess = true;
+                        }
+                    }
+
+                    if (!$isSuccess && !empty($successKey)) {
+                        if (stripos($respStr, $successKey) !== false || stripos($respStr, 'submitted successfully') !== false) {
+                            $isSuccess = true;
+                        }
+                    }
+
+                    if ($isSuccess) {
                         $keywordMatched = true;
                         $get_sms_status = $customer_status = 'Delivered';
                     } else {
                         $customer_status = 'Failed';
-                        $get_sms_status  = trim((string) $get_sms_status) . " [DebugRef:$debugRef]";
+                        if (is_array($decoded) && !empty($decoded['error_message'])) {
+                            $get_sms_status = $decoded['error_message'] . " [DebugRef:$debugRef]";
+                        } else {
+                            $get_sms_status = $respStr . " [DebugRef:$debugRef]";
+                        }
                     }
                 }
 
@@ -256,6 +266,7 @@
                 ]);
 
                 curl_close($ch);
+
             } else if ($sending_server->type == 'smpp') {
 
                 $sender_id = $data['sender_id'];
@@ -12232,26 +12243,27 @@
                 }
             }
 
-            $cost = substr_count($get_sms_status, 'Delivered') == 1 ? $data['cost'] : '0';
+            $cost = (stripos($get_sms_status, 'Delivered') !== false || ($customer_status ?? '') === 'Delivered') ? ($data['cost'] ?? '0') : '0';
 
             if ( ! isset($customer_status)) {
                 $customer_status = $get_sms_status;
             }
 
-            $customer_status = substr_count($customer_status, 'Delivered') == 1 ? 'Delivered' : 'Failed';
+            $customer_status = (stripos($customer_status, 'Delivered') !== false || stripos($get_sms_status, 'Delivered') !== false) ? 'Delivered' : 'Failed';
 
 
             $reportsData = [
-                'user_id'           => $data['user_id'],
+                'user_id'           => $data['user_id'] ?? ($sending_server->user_id ?? 1),
                 'to'                => str_replace(['(', ')', '+', '-', ' '], '', $phone),
                 'message'           => $message,
-                'sms_type'          => $data['sms_type'],
+                'sms_type'          => $data['sms_type'] ?? 'plain',
                 'status'            => $get_sms_status,
                 'customer_status'   => $customer_status,
-                'sms_count'         => $data['sms_count'],
+                'sms_count'         => $data['sms_count'] ?? 1,
                 'cost'              => $cost,
                 'sending_server_id' => $sending_server->id,
             ];
+
 
             if (isset($data['sender_id'])) {
                 $reportsData['from'] = $data['sender_id'];
@@ -15753,11 +15765,11 @@
                 $username_value = $cg_info->username_value;
                 $password_value = null;
 
-                if ($cg_info->authorization == 'no_auth') {
+                if ($cg_info->authorization == 'no_auth' && !empty($username_param)) {
                     $send_custom_data[$username_param] = $username_value;
                 }
 
-                if ($cg_info->password_status) {
+                if ($cg_info->password_status && !empty($cg_info->password_param)) {
                     $password_param = $cg_info->password_param;
                     $password_value = $cg_info->password_value;
 
@@ -15766,74 +15778,60 @@
                     }
                 }
 
-                if ($cg_info->action_status) {
-                    $action_param = $cg_info->action_param;
-                    $action_value = $cg_info->action_value;
-
-                    $send_custom_data[$action_param] = $action_value;
+                if (!empty($cg_info->action_param)) {
+                    $send_custom_data[$cg_info->action_param] = $cg_info->action_value ?? 'text';
                 }
 
-                if ($cg_info->source_status) {
+                if (!empty($cg_info->source_param)) {
                     $source_param = $cg_info->source_param;
                     $source_value = $cg_info->source_value;
 
-                    if (isset($data['sender_id']) && $data['sender_id'] != '') {
+                    if (!empty($data['sender_id'])) {
                         $send_custom_data[$source_param] = $data['sender_id'];
-                    } else {
+                    } elseif (!empty($source_value)) {
                         $send_custom_data[$source_param] = $source_value;
                     }
                 }
 
-                $destination_param                    = $cg_info->destination_param;
+                $destination_param                    = $cg_info->destination_param ?: 'number';
                 $send_custom_data[$destination_param] = $data['phone'];
 
-                $message_param                    = $cg_info->message_param;
-                $send_custom_data[$message_param] = $data['message'];
+                $message_param                    = $cg_info->message_param ?: 'message';
+                $send_custom_data[$message_param] = $data['message'] ?? '';
 
-                if ($cg_info->unicode_status) {
-                    $unicode_param                    = $cg_info->unicode_param;
-                    $unicode_value                    = $cg_info->unicode_value;
-                    $send_custom_data[$unicode_param] = $unicode_value;
+                $isUnicode = ($data['sms_type'] ?? '') == 'unicode' || (!empty($data['message']) && strlen($data['message']) != mb_strlen($data['message'], 'utf-8'));
+                if ($isUnicode) {
+                    if (!empty($cg_info->unicode_param)) {
+                        $send_custom_data[$cg_info->unicode_param] = $cg_info->unicode_value ?: 'unicode';
+                    } elseif (!empty($cg_info->action_param) && $cg_info->action_param == 'type') {
+                        $send_custom_data['type'] = 'unicode';
+                    }
                 }
 
-                if ($cg_info->route_status) {
-                    $route_param = $cg_info->route_param;
-                    $route_value = $cg_info->route_value;
-
-                    $send_custom_data[$route_param] = $route_value;
+                if ($cg_info->route_status && !empty($cg_info->route_param)) {
+                    $send_custom_data[$cg_info->route_param] = $cg_info->route_value;
                 }
 
-                if ($cg_info->language_status) {
-                    $language_param = $cg_info->language_param;
-                    $language_value = $cg_info->language_value;
-
-                    $send_custom_data[$language_param] = $language_value;
+                if ($cg_info->language_status && !empty($cg_info->language_param)) {
+                    $send_custom_data[$cg_info->language_param] = $cg_info->language_value;
                 }
 
-                if ($cg_info->custom_one_status) {
-                    $custom_one_param = $cg_info->custom_one_param;
-                    $custom_one_value = $cg_info->custom_one_value;
-
-                    $send_custom_data[$custom_one_param] = $custom_one_value;
+                if ($cg_info->custom_one_status && !empty($cg_info->custom_one_param)) {
+                    $send_custom_data[$cg_info->custom_one_param] = $cg_info->custom_one_value;
                 }
 
-                if ($cg_info->custom_two_status) {
-                    $custom_two_param = $cg_info->custom_two_param;
-                    $custom_two_value = $cg_info->custom_two_value;
-
-                    $send_custom_data[$custom_two_param] = $custom_two_value;
+                if ($cg_info->custom_two_status && !empty($cg_info->custom_two_param)) {
+                    $send_custom_data[$cg_info->custom_two_param] = $cg_info->custom_two_value;
                 }
 
-                if ($cg_info->custom_three_status) {
-                    $custom_three_param = $cg_info->custom_three_param;
-                    $custom_three_value = $cg_info->custom_three_value;
-
-                    $send_custom_data[$custom_three_param] = $custom_three_value;
+                if ($cg_info->custom_three_status && !empty($cg_info->custom_three_param)) {
+                    $send_custom_data[$cg_info->custom_three_param] = $cg_info->custom_three_value;
                 }
 
                 $ch = curl_init();
 
-                if ($cg_info->http_method == 'get') {
+                $method = strtolower($cg_info->http_request_method ?? $cg_info->http_method ?? 'get');
+                if ($method == 'get') {
                     $sending_url = $gateway_url . '?' . http_build_query($send_custom_data);
                     curl_setopt($ch, CURLOPT_URL, $sending_url);
                     curl_setopt($ch, CURLOPT_HTTPGET, 1);
