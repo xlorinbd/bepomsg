@@ -67,9 +67,13 @@
                 return $this->error('You do not have permission to access API', 403);
             }
 
+            // Use activeSubscription() (not the raw relation) — it auto-heals
+            // a missing/expired subscription instead of leaving it null.
+            $subscription = $user->customer->activeSubscription();
+
             $data = [
                 'sms_credit_balance' => (int) $user->sms_balance,
-                'expired_on'         => Tool::customerDateTime($user->customer->subscription->current_period_ends_at),
+                'expired_on'         => $subscription ? Tool::customerDateTime($subscription->current_period_ends_at) : null,
             ];
 
             return $this->success($data);

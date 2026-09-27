@@ -210,6 +210,14 @@ class EloquentAccountRepository extends EloquentBaseRepository implements Accoun
             $permissions = collect(json_decode($user->customer->permissions, true));
         }
 
+        // Session/customer lookups above only populate $permissions for
+        // session-based (web) requests or customer accounts; stateless API
+        // requests and non-customer accounts (e.g. admins other than id 1)
+        // otherwise leave it null, which crashed every permission check.
+        if (! $permissions instanceof \Illuminate\Support\Collection) {
+            $permissions = collect($permissions ?? []);
+        }
+
         if ($permissions->isEmpty()) {
             return false;
         }

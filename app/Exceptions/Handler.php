@@ -70,7 +70,7 @@ class Handler extends ExceptionHandler
             return \response()->json([
                 'status' => 'error',
                 'message' => $exception->getMessage(),
-            ]);
+            ], $this->jsonStatusCode($exception));
         }
 
         if (config('app.env') != 'local') {
@@ -91,5 +91,25 @@ class Handler extends ExceptionHandler
         }
 
         return parent::render($request, $exception);
+    }
+
+    /**
+     * The JSON branch above used to call response()->json() with no status
+     * argument, which silently defaults to 200 — so every API error
+     * (bad/missing token, validation, not found, permission denied, or an
+     * unrelated server bug) came back as HTTP 200 with a JSON error body.
+     * That reads as "unauthorized"/broken to any client that checks the
+     * status code. Resolve the real status code instead.
+     */
+    private function jsonStatusCode(Throwable $exception): int
+    {
+        return match (true) {
+            $exception instanceof AuthenticationException => Response::HTTP_UNAUTHORIZED,
+            $exception instanceof AuthorizationException => Response::HTTP_FORBIDDEN,
+            $exception instanceof ValidationException => $exception->status,
+            $exception instanceof ModelNotFoundException => Response::HTTP_NOT_FOUND,
+            $exception instanceof HttpException => $exception->getStatusCode(),
+            default => Response::HTTP_INTERNAL_SERVER_ERROR,
+        };
     }
 }
